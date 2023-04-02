@@ -97,9 +97,8 @@ def pagerank_scipy_parallel(
 
 
 
-def get_pagerank(pagerank_args_):
-    alpha, split_indices = pagerank_args_
-    return alpha * (x @ A[:,split_indices] + sum(x[split_indices][is_dangling]) * dangling_weights[split_indices]) + (1 - alpha) * p[split_indices]
+def get_pagerank(alpha_, split_indices):
+    return alpha_ * (x @ A[:,split_indices] + sum(x[split_indices][is_dangling]) * dangling_weights[split_indices]) + (1 - alpha_) * p[split_indices]
 
     
 
