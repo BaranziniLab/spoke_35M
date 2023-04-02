@@ -156,6 +156,6 @@ def pagerank_scipy(
     raise nx.PowerIterationFailedConvergence(max_iter)
 
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()
 
