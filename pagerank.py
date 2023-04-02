@@ -13,7 +13,7 @@ NCORES = int(sys.argv[3])
 
 
 def main():
-    G = nx.read_gpickle(GRAPH_PATH)
+    G = nx.read_graphpickle(GRAPH_PATH)
     personalization = {"Disease:DOID:14330":1}
     # pagerank_scipy(G, personalization)
     start_time = time.time()
@@ -41,7 +41,7 @@ def pagerank_scipy_parallel(
         return {}
 
     nodelist = list(G)
-    A = nx.to_scipy_sparse_matrix(G, nodelist=nodelist, weight=weight, dtype=float)
+    A = nx.to_scipy_sparse_array(G, nodelist=nodelist, weight=weight, dtype=float)
     S = A.sum(axis=1)
     S = np.ravel(S)
     S[S != 0] = 1.0 / S[S != 0]
