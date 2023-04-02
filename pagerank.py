@@ -17,7 +17,7 @@ def main():
     start_time_read = time.time()
     with open(GRAPH_PATH, "rb") as f:
         G = pickle.load(f)
-    print("Graph is loaded in {} min".format(round((time.time()-start_time)/(60),2)))
+    print("Graph is loaded in {} min".format(round((time.time()-start_time_read)/(60),2)))
     # G = nx.read_graphpickle(GRAPH_PATH)
     personalization = {"Disease:DOID:14330":1}
     # pagerank_scipy(G, personalization)
