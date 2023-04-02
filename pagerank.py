@@ -4,6 +4,7 @@ import scipy.sparse
 import networkx as nx
 import multiprocessing as mp
 import sys
+import pickle
 import time
 
 
@@ -13,7 +14,9 @@ NCORES = int(sys.argv[3])
 
 
 def main():
-    G = nx.read_graphpickle(GRAPH_PATH)
+    with open(GRAPH_PATH, "rb") as f:
+        G = pickle.load(f)
+    # G = nx.read_graphpickle(GRAPH_PATH)
     personalization = {"Disease:DOID:14330":1}
     # pagerank_scipy(G, personalization)
     start_time = time.time()
