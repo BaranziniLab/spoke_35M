@@ -39,7 +39,7 @@ def pagerank_scipy_parallel(
     ncores=1    
 ):
 
-    global A, x, dangling_weights, p, alpha, is_dangling
+    global A, x, dangling_weights, p, is_dangling
 
     N = len(G)
     if N == 0:
@@ -80,10 +80,11 @@ def pagerank_scipy_parallel(
 
     # power iteration: make up to max_iter iterations
     split_column_indices = np.array_split(range(A.shape[-1]), split)
+    pagerank_args = list(zip([alpha]*len(split_column_indices), split_column_indices))
     p = mp.Pool(ncores)
     for _ in range(max_iter):
         xlast = x
-        x_list = p.map(get_pagerank, split_column_indices)
+        x_list = p.starmap(get_pagerank, pagerank_args)
         x = np.concatenate(x_list)
         del(x_list)
         # check convergence, l1 norm
@@ -96,7 +97,8 @@ def pagerank_scipy_parallel(
 
 
 
-def get_pagerank(split_indices):
+def get_pagerank(pagerank_args_):
+    alpha, split_indices = pagerank_args_
     return alpha * (x @ A[:,split_indices] + sum(x[split_indices][is_dangling]) * dangling_weights[split_indices]) + (1 - alpha) * p[split_indices]
 
     

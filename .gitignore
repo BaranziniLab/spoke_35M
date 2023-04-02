@@ -2,3 +2,4 @@ venv/
 config.ini
 __pycache__
 logs/
+pid_info.sh
