@@ -18,7 +18,7 @@ s3_client = boto3.client('s3')
 
 # Set up S3 bucket and object key
 bucket_name = 'ic-spoke'
-object_key = 'sample_dict_data.pickle'
+object_key = 'spoke35M/sample_dict_data.pickle'
 
 # Upload the binary data to S3 bucket as an object
 start_time = time.time()
