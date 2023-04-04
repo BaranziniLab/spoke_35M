@@ -1,6 +1,7 @@
 import boto3
 import pickle
 import numpy as np
+import time
 
 # Assume you have the following dictionary
 data = {
@@ -17,7 +18,9 @@ s3_client = boto3.client('s3')
 
 # Set up S3 bucket and object key
 bucket_name = 'ic-spoke'
-object_key = 'sample_data.pickle'
+object_key = 'sample_dict_data.pickle'
 
 # Upload the binary data to S3 bucket as an object
+start_time = time.time()
 s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=binary_data)
+print("Transferred to S3 in {} min".format(round((time.time()-start_time)/(60),2)))
