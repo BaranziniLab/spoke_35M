@@ -34,7 +34,7 @@ def personalized_pagerank(node_id):
 				"feature_ids": np.array(list(pagerank.keys()))
 				}
 	del pagerank
-	filename = 'spoke35M/{}_dict.pickle'.format(node_id)
+	filename = '{}_dict.pickle'.format(node_id)
 	with open(filename, 'wb') as f:
 		pickle.dump(out_dict, f)
 	del out_dict
