@@ -17,7 +17,6 @@ def main():
 	mapping_file_df = pd.read_csv(MAPPING_FILE)
 	mapping_file_df["spoke_identifer"] = "Compound:" + mapping_file_df["spoke_identifer"]
 	node_list = mapping_file_df["spoke_identifer"].unique()
-	node_list = node_list[0:2]
 	with open(GRAPH_PATH, "rb") as f:
 		G = pickle.load(f)
 	p = mp.Pool(NCORES)
