@@ -30,6 +30,8 @@ def main():
 		G = pickle.load(f)
 	p = mp.Pool(NCORES)
 	p.map(personalized_pagerank, node_list)
+	p.close()
+	p.join()
 	print("Files are created and transferred to S3 in {} hrs".format(round((time.time() - start_time) / (60*60), 2)))
 
 
