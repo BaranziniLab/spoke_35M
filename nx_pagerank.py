@@ -22,8 +22,9 @@ def main():
 	out = os.popen(cmd)
 	out_list = out.read().split("\n")
 	saved_compound_list = np.array([element for element in out_list if "Compound:inchikey:" in element])
+	saved_compound_list_ = ['Compound:inchikey:' + element.split("Compound:inchikey:")[-1].replace('_dict.pickle', '') for element in saved_compound_list if "Compound:inchikey:" in element]
 	node_list = mapping_file_df["spoke_identifer"].unique()
-	node_list = list(set(node_list) - set(saved_compound_list))
+	node_list = list(set(node_list) - set(saved_compound_list_))
 	print(len(node_list))
 	sys.exit(0)
 	with open(GRAPH_PATH, "rb") as f:
