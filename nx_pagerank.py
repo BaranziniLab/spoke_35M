@@ -6,17 +6,26 @@ import multiprocessing as mp
 import pandas as pd
 import numpy as np
 import boto3
+import os
 
 GRAPH_PATH = sys.argv[1]
 MAPPING_FILE = sys.argv[2]
 NCORES = int(sys.argv[3])
+
 
 def main():
 	start_time = time.time()
 	global G
 	mapping_file_df = pd.read_csv(MAPPING_FILE)
 	mapping_file_df["spoke_identifer"] = "Compound:" + mapping_file_df["spoke_identifer"]
+	cmd = "aws s3 ls s3://ic-spoke/spoke35M/"
+	out = os.popen(cmd)
+	out_list = out.read().split("\n")
+	saved_compound_list = np.array([element for element in out_list if "Compound:inchikey:" in element])
 	node_list = mapping_file_df["spoke_identifer"].unique()
+	node_list = list(set(node_list) - set(saved_compound_list))
+	print(len(node_list))
+	sys.exit(0)
 	with open(GRAPH_PATH, "rb") as f:
 		G = pickle.load(f)
 	p = mp.Pool(NCORES)
