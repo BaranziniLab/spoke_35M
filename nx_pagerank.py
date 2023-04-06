@@ -52,11 +52,17 @@ def main():
 
 def personalized_pagerank(node_id):
 	personalization = {node_id: 1}
-	pagerank = nx.pagerank(G, alpha=0.85, personalization=personalization, max_iter=100, tol=1e-06)
-	out_dict = {"node_id": node_id,
-				"embedding": np.array(list(pagerank.values()))
-				}
-	del pagerank
+	try:
+		pagerank = nx.pagerank(G, alpha=0.85, personalization=personalization, max_iter=100, tol=1e-06)
+		out_dict = {"node_id": node_id,
+					"embedding": np.array(list(pagerank.values()))
+					}
+		del pagerank
+	except:
+		out_dict = {
+			"node_id": node_id,
+			"embedding": np.array([])
+		}
 	binary_data = pickle.dumps(out_dict)
 	del out_dict
 	s3_client = boto3.client('s3')
