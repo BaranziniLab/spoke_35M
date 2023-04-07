@@ -22,5 +22,4 @@ def get_saved_compounds_with_no_pagerank():
 	  response = s3_client.head_object(Bucket=bucket_name, Key=object_key)
 	  if response['ContentLength'] < 222:
 	    compounds_with_no_pagerank.append(node_id)
-    return compounds_with_no_pagerank
-
+	return compounds_with_no_pagerank
