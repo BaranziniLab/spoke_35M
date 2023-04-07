@@ -29,7 +29,7 @@ print("There are {} short chain fatty acids shared in global file".format(global
 print("They are:")
 print(global_short_chain_shared_merge)
 
-
+print("Checking for saved compounds with no pagerank ...")
 compounds_with_no_pagerank = get_saved_compounds_with_no_pagerank()
 print("There are {} Compounds with no pagerank".format(len(compounds_with_no_pagerank)))
 
