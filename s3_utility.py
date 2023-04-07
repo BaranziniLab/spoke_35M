@@ -12,7 +12,8 @@ def get_saved_compoundid_from_s3():
 	return saved_compound_list_
 
 
-def get_saved_compounds_with_no_pagerank(saved_compound_list_):
+def get_saved_compounds_with_no_pagerank():
+	saved_compound_list_ = get_saved_compoundid_from_s3()
 	s3_client = boto3.client('s3')
 	bucket_name = 'ic-spoke'
 	compounds_with_no_pagerank = []

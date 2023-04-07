@@ -3,6 +3,7 @@ import numpy as np
 import os
 import sys
 import boto3
+from s3_utility import get_saved_compounds_with_no_pagerank 
 
 GLOBAL_MAPPING_FILE = sys.argv[1]
 SHORTCHAIN_MAPPING_FILE = sys.argv[2]
@@ -29,23 +30,7 @@ print("They are:")
 print(global_short_chain_shared_merge)
 
 
-cmd = "aws s3 ls s3://ic-spoke/spoke35M/"
-out = os.popen(cmd)
-out_list = out.read().split("\n")
-saved_compound_list = np.array([element for element in out_list if "Compound:inchikey:" in element])
-saved_compound_list_ = ['Compound:inchikey:' + element.split("Compound:inchikey:")[-1].replace('_dict.pickle', '') for element in saved_compound_list if "Compound:inchikey:" in element]
-
-s3_client = boto3.client('s3')
-bucket_name = 'ic-spoke'
-compounds_with_no_pagerank = []
-for node_id in saved_compound_list_:
-  object_key = 'spoke35M/{}_dict.pickle'.format(node_id)
-  response = s3_client.head_object(Bucket=bucket_name, Key=object_key)
-  if response['ContentLength'] < 222:
-    compounds_with_no_pagerank.append(node_id)
+compounds_with_no_pagerank = get_saved_compounds_with_no_pagerank()
 print("There are {} Compounds with no pagerank".format(len(compounds_with_no_pagerank)))
-compounds_with_no_pagerank_df = pd.DataFrame(compounds_with_no_pagerank, columns=["node_id"])
-csv_string = compounds_with_no_pagerank_df.to_csv(index=False)
-s3_client.put_object(Bucket=bucket_name, Key="spoke35M/compounds_with_no_pagerank.csv", Body=csv_string.encode('utf-8'))
 
 
