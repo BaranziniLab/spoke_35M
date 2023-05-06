@@ -1,6 +1,16 @@
 import boto3
 import os
 import numpy as np
+import pickle
+
+
+def read_pickle_file_from_s3(bucket_name, object_key):
+	s3 = boto3.client('s3')
+	response = s3.get_object(Bucket=bucket_name, Key=object_key)
+	content = response['Body'].read()
+	data = pickle.loads(content)
+	return data
+
 
 
 def get_saved_compoundid_from_s3():
