@@ -7,7 +7,7 @@ s3 = boto3.client('s3')
 
 # specify the S3 bucket name and the object key (i.e., the file name)
 bucket_name = 'ic-spoke'
-object_key = 'spoke35M/Compound:inchikey:FERIUCNNQQJTOY-UHFFFAOYSA-N_dict.pickle'
+object_key = 'spoke35M/spoke35M_converged_ppr/Compound:inchikey:FERIUCNNQQJTOY-UHFFFAOYSA-N_dict.pickle'
 
 start_time = time.time()
 # download the file as a stream
