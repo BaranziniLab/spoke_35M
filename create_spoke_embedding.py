@@ -3,6 +3,7 @@ import boto3
 import pickle
 import sys
 import time
+import os
 
 
 compound_type = sys.argv[1]
@@ -14,11 +15,14 @@ pvalue_thresh = 0.05
 bucket_name = 'ic-spoke'
 sheet_name_list = ["Without outlier", "Without outlier-MS treated", "Without outlier-MS not treated",
               "With outlier", "With outlier-MStreated", "With outlier-MS not treated"]
+print("Fetching compounds with pagerank in S3 bucket ...")
 compounds_with_pagerank = get_saved_compounds_with_pagerank()
+print("Fetched!")
 
 
 def main():
     start_time = time.time()
+    print("Starting to create SPOKE embedding vector ...")
     spoke_embedding_dict = get_spoke_embedding(compound_type, sample, sel_sheet_index, data_path, pvalue_thresh=pvalue_thresh)
     binary_data = pickle.dumps(spoke_embedding_dict)
     del(spoke_embedding_dict)
