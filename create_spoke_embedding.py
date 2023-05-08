@@ -4,6 +4,7 @@ import pickle
 import sys
 import time
 import os
+import pandas as pd
 
 
 compound_type = sys.argv[1]
@@ -46,8 +47,7 @@ def get_spoke_embedding(compound_type, sample, sel_sheet_index, data_path, pvalu
             entry_point_count += 1
             object_key = "spoke35M/spoke35M_converged_ppr/" + compound_id + "_dict.pickle"
             spoke_embedding_data = read_pickle_file_from_s3(bucket_name, object_key)
-            spoke_vector += row["disease_coeff"]*spoke_embedding_data["embedding"]
-            del(spoke_embedding_data)
+            spoke_vector += row["disease_coeff"]*spoke_embedding_data["embedding"]            
     spoke_embedding_dict["compound_type"] = compound_type
     spoke_embedding_dict["sample"] = sample
     spoke_embedding_dict["data_spec"] = sheet_name_list[sel_sheet_index]
