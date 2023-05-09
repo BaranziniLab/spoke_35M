@@ -44,7 +44,10 @@ def main():
 
 def get_shortest_pathlength_distribution(source_nodetype):
 	source_nodes = [node for node in G.nodes if node.startswith(source_nodetype+":")]
-	random_source_nodes = random.sample(source_nodes, N_RANDOM_SOURCE_NODES)
+	if len(source_nodes) >= N_RANDOM_SOURCE_NODES:
+		random_source_nodes = random.sample(source_nodes, N_RANDOM_SOURCE_NODES)
+	else:
+		random_source_nodes = source_nodes
 	node_type_specific_shortest_path_length_list = []
 	for source_node in random_source_nodes:
 		node_type_specific_shortest_path_length_list.append(nx.shortest_path_length(G, source=source_node, target=TARGET_NODE))
