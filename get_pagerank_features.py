@@ -14,12 +14,12 @@ node_list = ["Compound:inchikey:AAOVKJBEBIDNHE-UHFFFAOYSA-N"]
 
 def main():
 	start_time = time.time()
-    with open(GRAPH_PATH, "rb") as f:
-        G = pickle.load(f)
+	with open(GRAPH_PATH, "rb") as f:
+	    G = pickle.load(f)
 
-    for item in node_list:
-    	personalization = {item:1}
-    	personalized_pagerank = nx.pagerank(G, alpha=0.85, personalization=personalization, max_iter=200, tol=1e-12)
+	for item in node_list:
+		personalization = {item:1}
+		personalized_pagerank = nx.pagerank(G, alpha=0.85, personalization=personalization, max_iter=200, tol=1e-12)
 	features = np.array(list(personalized_pagerank.keys()))
 	binary_data = pickle.dumps(features)
 	s3_client = boto3.client('s3')
@@ -33,4 +33,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+	main()
