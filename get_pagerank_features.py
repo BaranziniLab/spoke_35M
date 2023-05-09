@@ -5,6 +5,7 @@ import boto3
 import os
 import numpy as np
 import time
+import gzip
 
 
 GRAPH_PATH = sys.argv[1]
@@ -23,10 +24,11 @@ def main():
 	features = {}
 	features["features"] = np.array(list(personalized_pagerank.keys()))
 	binary_data = pickle.dumps(features)
+	compressed_data = gzip.compress(binary_data)
 	s3_client = boto3.client('s3')
 	bucket_name = 'ic-spoke'
-	object_key = 'spoke35M/spoke35M_converged_ppr/ppr_features_dict.pickle'
-	s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=binary_data)
+	object_key = 'spoke35M/spoke35M_converged_ppr/ppr_features_dict_gzip_compressed'
+	s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=compressed_data)
 	s3_client.close()
 	completion_time = round((time.time()-start_time)/(60),2)
 	print("Features are extracted from PPR and then stored in S3 in {} min!".format(completion_time))
