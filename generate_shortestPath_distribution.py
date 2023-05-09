@@ -21,7 +21,7 @@ def main():
 	s3_client = boto3.client('s3')
 	bucket_name = 'ic-spoke'
 	object_key = "spoke35M/spoke35M_converged_ppr/spoke35M_ppr_features.csv"
-	s3_object = s3.get_object(Bucket=bucket_name, Key=object_key)
+	s3_object = s3_client.get_object(Bucket=bucket_name, Key=object_key)
 	feature_df = pd.read_csv(s3_object["Body"])
 	unique_nodetypes = feature_df.node_type.unique()
 	print("Extracted unique nodetypes from the feature file!")
