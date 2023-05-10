@@ -32,6 +32,8 @@ def main():
 	embedding = embedding_dict["embedding"]
 	p = mp.Pool(NCORES)
 	top_nodes_list_of_dict = p.map(get_top_nodes_for_the_nodetype, unique_nodetypes)
+	p.close()
+	p.join()
 	binary_data = pickle.dumps(top_nodes_list_of_dict)
 	filename = "top_nodes_for_each_nodetype_for_" + compound_type + "_compounds_" + sample + "_sample_" + "sheet_index_" + sheet_index + "_list.pickle"
 	object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/{}".format(filename)
