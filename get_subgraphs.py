@@ -3,6 +3,7 @@ import networkx as nx
 import pickle
 import sys
 from utility import get_significant_compounds_with_disease_association
+import numpy as np
 
 
 compound_type = sys.argv[1]
@@ -23,6 +24,8 @@ starting_compound_nodes = GLM_significant_compounds_mapped_to_SPOKE.spoke_identi
 
 filename = "top_nodes_for_each_nodetype_for_" + compound_type + "_compounds_" + sample + "_sample_" + "sheet_index_" + str(sel_sheet_index) + "_list.pickle"
 object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/{}".format(filename)
+s3_client = boto3.client('s3')
+bucket_name = 'ic-spoke'
 response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
 top_nodes = pickle.loads(response['Body'].read())
 intermediate_nodes = []
@@ -39,10 +42,10 @@ for item in top_nodes:
 intermediate_nodes = np.concatenate(intermediate_nodes)
 paths = []
 for starting_node in starting_compound_nodes:
-	for path in nx.all_simple_paths(G, starting_node, destination_disease_node): 
-		if len(list(path)) == 2:
+	for path in nx.all_simple_paths(G, starting_node, destination_disease_node, cutoff=5): 
+		if len(path) == 2:
 			paths.append(path)
-		elif set(intermediate_nodes).intersection(set(path)):
+		elif len(set(intermediate_nodes).intersection(set(path))) > 1:
 			paths.append(path)
 
 
