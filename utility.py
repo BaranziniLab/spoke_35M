@@ -6,6 +6,10 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
 
+sheet_name_list = ["Without outlier", "Without outlier-MS treated", "Without outlier-MS not treated",
+              "With outlier", "With outlier-MStreated", "With outlier-MS not treated"]
+
+
 def get_spoke_embedding(compound_type, sample, sel_sheet_index, data_path, pvalue_thresh=0.05):
     GLM_significant_compounds_mapped_to_SPOKE = get_significant_compounds_with_disease_association(compound_type, sample, sel_sheet_index, data_path, pvalue_thresh=pvalue_thresh)
     spoke_embedding_dict = {}
