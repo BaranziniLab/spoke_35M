@@ -50,7 +50,11 @@ def get_shortest_pathlength_distribution(source_nodetype):
 		random_source_nodes = source_nodes
 	node_type_specific_shortest_path_length_list = []
 	for source_node in random_source_nodes:
-		node_type_specific_shortest_path_length_list.append(nx.shortest_path_length(G, source=source_node, target=TARGET_NODE))
+		try:
+			shortest_pathlength = nx.shortest_path_length(G, source=source_node, target=TARGET_NODE)
+		except:
+			shortest_pathlength = None
+		node_type_specific_shortest_path_length_list.append(shortest_pathlength)
 	node_type_specific_shortest_path_length_dict = {}
 	node_type_specific_shortest_path_length_dict["node_type"] = source_nodetype
 	node_type_specific_shortest_path_length_dict["shortest_pathLength_distribution"] = node_type_specific_shortest_path_length_list
