@@ -1,6 +1,7 @@
 import sys
 import pickle
 import boto3
+import networkx as nx
 import multiprocessing as mp
 import pandas as pd
 import numpy as np
