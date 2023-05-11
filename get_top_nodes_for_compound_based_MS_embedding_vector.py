@@ -69,14 +69,48 @@ def get_top_nodes_for_the_nodetype(sel_nodetype):
 	if nodetype_specific_feature_df_negative.shape[0] != 0:
 		nodetype_specific_feature_df_negative.sort_values(by="embedding_values", inplace=True)
 		top_negative_nodes = nodetype_specific_feature_df_negative.head(top_node_count)
-		top_negative_nodes = get_shortest_path_to_disease_node(top_negative_nodes, nodetype_specific_shortest_pathlength_distribution_none_removed_mean, nodetype_specific_shortest_pathlength_distribution_none_removed_std)
+		
+		shortest_pathlength_list = []
+		shortest_pathlength_p_value_list = []
+		for index, row in top_negative_nodes.iterrows():
+			source_node = row["node_type"] + ":" + row["node_id"]
+			try:
+				shortest_pathlength = nx.shortest_path_length(G, source=source_node, target=destination_disease_node)
+				z_score = (shortest_pathlength - mean_) / std_
+				p_value = norm.cdf(z_score)
+			except:
+				shortest_pathlength = None
+				p_value = None
+			shortest_pathlength_list.append(shortest_pathlength)
+			shortest_pathlength_p_value_list.append(p_value)
+		top_negative_nodes["shortest_pathlength_to_MS_disease_node"] = shortest_pathlength_list
+		top_negative_nodes["p_value"] = shortest_pathlength_p_value_list
+
+		# top_negative_nodes = get_shortest_path_to_disease_node(top_negative_nodes, nodetype_specific_shortest_pathlength_distribution_none_removed_mean, nodetype_specific_shortest_pathlength_distribution_none_removed_std)
 		print(top_negative_nodes)
 	else:
 		top_negative_nodes = None
 	if nodetype_specific_feature_df_positive.shape[0] != 0:
 		nodetype_specific_feature_df_positive.sort_values(by="embedding_values", inplace=True)
 		top_positive_nodes = nodetype_specific_feature_df_positive.tail(top_node_count)
-		top_positive_nodes = get_shortest_path_to_disease_node(top_positive_nodes, nodetype_specific_shortest_pathlength_distribution_none_removed_mean, nodetype_specific_shortest_pathlength_distribution_none_removed_std)
+
+		shortest_pathlength_list = []
+		shortest_pathlength_p_value_list = []
+		for index, row in top_positive_nodes.iterrows():
+			source_node = row["node_type"] + ":" + row["node_id"]
+			try:
+				shortest_pathlength = nx.shortest_path_length(G, source=source_node, target=destination_disease_node)
+				z_score = (shortest_pathlength - mean_) / std_
+				p_value = norm.cdf(z_score)
+			except:
+				shortest_pathlength = None
+				p_value = None
+			shortest_pathlength_list.append(shortest_pathlength)
+			shortest_pathlength_p_value_list.append(p_value)
+		top_positive_nodes["shortest_pathlength_to_MS_disease_node"] = shortest_pathlength_list
+		top_positive_nodes["p_value"] = shortest_pathlength_p_value_list
+
+		# top_positive_nodes = get_shortest_path_to_disease_node(top_positive_nodes, nodetype_specific_shortest_pathlength_distribution_none_removed_mean, nodetype_specific_shortest_pathlength_distribution_none_removed_std)
 		print(top_positive_nodes)
 	else:
 		top_positive_nodes = None
