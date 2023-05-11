@@ -1,4 +1,5 @@
 import sys
+import pickle
 import boto3
 import multiprocessing as mp
 import pandas as pd
