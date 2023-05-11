@@ -71,14 +71,12 @@ def get_top_nodes_for_the_nodetype(sel_nodetype):
 		nodetype_specific_feature_df_negative.sort_values(by="embedding_values", inplace=True)
 		top_negative_nodes = nodetype_specific_feature_df_negative.head(top_node_count)		
 		top_negative_nodes = get_shortest_path_to_disease_node(top_negative_nodes, nodetype_specific_shortest_pathlength_distribution_none_removed_mean, nodetype_specific_shortest_pathlength_distribution_none_removed_std)
-		print(top_negative_nodes)
 	else:
 		top_negative_nodes = None
 	if nodetype_specific_feature_df_positive.shape[0] != 0:
 		nodetype_specific_feature_df_positive.sort_values(by="embedding_values", inplace=True)
 		top_positive_nodes = nodetype_specific_feature_df_positive.tail(top_node_count)
 		top_positive_nodes = get_shortest_path_to_disease_node(top_positive_nodes, nodetype_specific_shortest_pathlength_distribution_none_removed_mean, nodetype_specific_shortest_pathlength_distribution_none_removed_std)
-		print(top_positive_nodes)
 	else:
 		top_positive_nodes = None
 	top_nodes_dict = {}
