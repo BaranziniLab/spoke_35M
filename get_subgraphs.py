@@ -4,7 +4,7 @@ import pickle
 import sys
 from utility import get_significant_compounds_with_disease_association
 import numpy as np
-
+import time
 
 compound_type = sys.argv[1]
 sample = sys.argv[2]
@@ -13,6 +13,8 @@ data_path = sys.argv[4]
 destination_disease_node = sys.argv[5]
 GRAPH_PATH = sys.argv[6]
 
+
+start_time = time.time()
 
 with open(GRAPH_PATH, "rb") as f:
     G = pickle.load(f)
@@ -40,13 +42,27 @@ for item in top_nodes:
 		intermediate_nodes.append(intermediate_node_id)
 
 intermediate_nodes = np.concatenate(intermediate_nodes)
-paths = []
+all_paths = {}
 for starting_node in starting_compound_nodes:
+	paths = []
 	for path in nx.all_simple_paths(G, starting_node, destination_disease_node, cutoff=5): 
 		if len(path) == 2:
 			paths.append(path)
 		elif len(set(intermediate_nodes).intersection(set(path))) > 1:
 			paths.append(path)
+	all_paths[starting_node] = paths
+all_paths["compound_type"] = compound_type
+all_paths["sample"] = sample
+all_paths["sheet_index"] = sel_sheet_index
+binary_data = pickle.dumps(all_paths)
+filename = "paths_for_" + compound_type + "_compounds_" + sample + "_sample_" + "sheet_index_" + str(sel_sheet_index) + "_dict.pickle"
+object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/{}".format(filename)
+s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=binary_data)
+s3_client.close()
+completion_time = round((time.time()-start_time)/(60),2)
+print("Completed in {} min".format(completion_time))
+
+
 
 
 
