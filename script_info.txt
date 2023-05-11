@@ -1,0 +1,37 @@
+nx_pagerank.py
+	- To get the personalized pagerank (PPR) vectors of nodes
+	Note: nx_pagerank_tolerance_optimization.py can be used for finding the right tolerance value.
+
+get_pagerank_features.py
+	- To get the feature map of the pagerank vectors
+
+create_spoke_embedding.py
+	- Create SPOKE embedding vectors using the saved PPR vectors and disease coeffient values from iMSMS data.
+
+generate_shortestPath_distribution.py
+	- To generate baseline distribution of the shortest path length between N random nodes of a specific nodetype to disease MS node. This distribution allows us to check the significance of a node's pathlength to MS disease node.
+
+get_top_nodes_for_compound_based_MS_embedding_vector.py
+	- This extracts and saved the top nodes from the SPOKE embedding vectors. This makes use of the above baseline distribution to check the significance of the proximity of these top nodes to MS disease node in graph space.
+
+get_subgraphs.py
+	- This extracts the subgraphs starting from the compounds of interest (for e.g. targeted/global/combined) followed by the salient intermediate nodes that are significantly proximal to MS disease node and finally to MS disease node
+
+
+*** Helper scripts ***
+s3_utility.py
+	- Helper functions related to S3 bucket
+
+utility.py
+	- Helper functions for SPOKE embedding analysis
+
+check_remaining_compounds_for_PPR.py
+	- To check how many compounds are yet to go for computing the PPR
+
+aws_s3_metabolite_briefing.py
+	- Check the info about the saved PPR vectors in S3 bucket, such as how many of the saved have PPR and how many of them do not have.
+
+
+*** Notebooks ***
+spoke_characterization.ipynb
+	- Gives information about the knowledge graph we are using for the analysis
