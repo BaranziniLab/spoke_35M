@@ -23,7 +23,7 @@ def main():
 	global G, feature_df, embedding, shortest_pathlength_distribution_dict
 	start_time = time.time()
 	with open(GRAPH_PATH, "rb") as f:
-    	G = pickle.load(f)
+		G = pickle.load(f)
 	print("Reading PPR feature map from S3 ...")
 	s3_client = boto3.client('s3')
 	bucket_name = 'ic-spoke'
