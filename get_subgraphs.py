@@ -1,76 +1,103 @@
-import boto3
-import networkx as nx
-import pickle
 import sys
-from utility import get_significant_compounds_with_disease_association
+import boto3
+import multiprocessing as mp
+import pandas as pd
 import numpy as np
 import time
+from utility import get_significant_compounds_with_disease_association
+
 
 compound_type = sys.argv[1]
 sample = sys.argv[2]
 sel_sheet_index = int(sys.argv[3])
 data_path = sys.argv[4]
-destination_disease_node = sys.argv[5]
-GRAPH_PATH = sys.argv[6]
-
-
-start_time = time.time()
-
-with open(GRAPH_PATH, "rb") as f:
-    G = pickle.load(f)
+GRAPH_PATH = sys.argv[5]
+NCORES = int(sys.argv[6])
 
 pvalue_thresh = 0.05
-GLM_significant_compounds_mapped_to_SPOKE = get_significant_compounds_with_disease_association(compound_type, sample, sel_sheet_index, data_path, pvalue_thresh=pvalue_thresh)
-GLM_significant_compounds_mapped_to_SPOKE.spoke_identifer = "Compound:" + GLM_significant_compounds_mapped_to_SPOKE.spoke_identifer
-starting_compound_nodes = GLM_significant_compounds_mapped_to_SPOKE.spoke_identifer.unique()
-
-filename = "top_nodes_for_each_nodetype_for_" + compound_type + "_compounds_" + sample + "_sample_" + "sheet_index_" + str(sel_sheet_index) + "_list.pickle"
-object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/{}".format(filename)
-s3_client = boto3.client('s3')
+destination_disease_node = "Disease:DOID:2377"
 bucket_name = 'ic-spoke'
-response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
-top_nodes = pickle.loads(response['Body'].read())
-intermediate_nodes = []
-for item in top_nodes:
-	if item["top_negative_nodes"].shape[0] != 0:		
-		item["top_negative_nodes"]["commposed_id"] = item["top_negative_nodes"]["node_type"] + ":" + item["top_negative_nodes"]["node_id"]
-		intermediate_node_id = item["top_negative_nodes"]["commposed_id"].head(5).unique()
-		intermediate_nodes.append(intermediate_node_id)
-	if item["top_positive_nodes"].shape[0] != 0:
-		item["top_positive_nodes"]["commposed_id"] = item["top_positive_nodes"]["node_type"] + ":" + item["top_positive_nodes"]["node_id"]
-		intermediate_node_id = item["top_positive_nodes"]["commposed_id"].tail(5).unique()
-		intermediate_nodes.append(intermediate_node_id)
-
-intermediate_nodes = np.concatenate(intermediate_nodes)
-all_paths = {}
-for starting_node in starting_compound_nodes:
-	paths = []
-	for path in nx.all_simple_paths(G, starting_node, destination_disease_node, cutoff=5): 
-		if len(path) == 2:
-			paths.append(path)
-		elif len(set(intermediate_nodes).intersection(set(path))) > 1:
-			paths.append(path)
-	all_paths[starting_node] = paths
-all_paths["compound_type"] = compound_type
-all_paths["sample"] = sample
-all_paths["sheet_index"] = sel_sheet_index
-binary_data = pickle.dumps(all_paths)
-filename = "paths_for_" + compound_type + "_compounds_" + sample + "_sample_" + "sheet_index_" + str(sel_sheet_index) + "_dict.pickle"
-object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/{}".format(filename)
-s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=binary_data)
-s3_client.close()
-completion_time = round((time.time()-start_time)/(60),2)
-print("Completed in {} min".format(completion_time))
 
 
+def main():
+	global G, s3_client
+	s3_client = boto3.client('s3')
+	start_time = time.time()
+	with open(GRAPH_PATH, "rb") as f:
+	    G = pickle.load(f)
+	starting_compound_nodes = get_starting_compound_nodes()
+	salient_intermediate_nodes_proximal_to_MS = get_salient_intermediate_nodes_proximal_to_MS()
+	compound_to_intermediate_paths = get_paths_from_compound_to_intermediate_nodes(starting_compound_nodes, salient_intermediate_nodes_proximal_to_MS)
+	intermediate_nodes_to_MS_node_paths = get_paths_from_intermediate_nodes_to_MS_node(salient_intermediate_nodes_proximal_to_MS, destination_disease_node)
+	extracted_path = {}
+	extracted_path["compound_to_intermediate"] = compound_to_intermediate_paths
+	extracted_path["intermediate_to_MS"] = intermediate_nodes_to_MS_node_paths
+	binary_data = pickle.dumps(extracted_path)
+	filename = "extracted_paths_for_" + compound_type + "_compounds_" + sample + "_sample_" + "sheet_index_" + str(sel_sheet_index) + "_dict.pickle"
+	object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/{}".format(filename)
+	s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=binary_data)
+	s3_client.close()
+	completion_time = round((time.time()-start_time)/(60),2)
+	print("Completed in {} min".format(completion_time))
 
 
+def get_paths_from_intermediate_nodes_to_MS_node(salient_intermediate_nodes_proximal_to_MS, destination_disease_node):
+	p = mp.Pool(NCORES)
+	args = zip(list(salient_intermediate_nodes_proximal_to_MS), [destination_disease_node]*len(salient_intermediate_nodes_proximal_to_MS))
+	intermediate_nodes_to_MS_node_paths_list = p.starmap(get_shortest_path, args)
+	p.close()
+	p.join()
+	intermediate_nodes_to_MS_node_paths = pd.concat(intermediate_nodes_to_MS_node_paths_list, ignore_index=True).drop_duplicates()
+	return intermediate_nodes_to_MS_node_paths
 
 
+def get_paths_from_compound_to_intermediate_nodes(starting_compound_nodes, salient_intermediate_nodes_proximal_to_MS):
+	compound_to_intermediate_path_dict = {}
+	p = mp.Pool(NCORES)
+	for starting_compound_node in starting_compound_nodes:		
+		args = list(zip([starting_compound_node]*len(salient_intermediate_nodes_proximal_to_MS), list(salient_intermediate_nodes_proximal_to_MS)))
+		compound_to_intermediate_path_list = p.starmap(get_shortest_path, args)
+		compound_to_intermediate_path_dict[starting_compound_node] = compound_to_intermediate_path_list
+	p.close()
+	p.join()
+	return compound_to_intermediate_path_dict
 
 
+def get_shortest_path(source, target):
+    try:
+        path_list = nx.shortest_path(G, source=source, target=target)
+        path_list_tuples = list(map(lambda x:(path_list[x], path_list[x+1]), range(len(path_list)-1)))
+    except:
+        path_list_tuples = []        
+    return pd.DataFrame(path_list_tuples, columns=['source', 'target'])
 
 
+def get_salient_intermediate_nodes_proximal_to_MS():
+	filename = "top_nodes_for_each_nodetype_for_" + compound_type + "_compounds_" + sample + "_sample_" + "sheet_index_" + str(sel_sheet_index) + "_list.pickle"
+	object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/{}".format(filename)
+	response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+	top_nodes_list_of_dict = pickle.loads(response['Body'].read())
+	salient_intermediate_nodes_proximal_to_MS = []
+	for item in top_nodes_list_of_dict:
+		top_negative_nodes = item["top_negative_nodes"]
+		top_positive_nodes = item["top_positive_nodes"]
+		top_nodes = pd.concat([top_negative_nodes, top_positive_nodes], ignore_index=True).dropna()
+		top_nodes_proximal_to_MS = top_nodes[top_nodes.p_value < pvalue_thresh]
+		top_nodes_proximal_to_MS["composite_id"] = top_nodes_proximal_to_MS["node_type"] + ":" + top_nodes_proximal_to_MS["node_id"]
+		salient_intermediate_nodes_proximal_to_MS.append(top_nodes_proximal_to_MS["composite_id"].values)
+	salient_intermediate_nodes_proximal_to_MS = np.concatenate(salient_intermediate_nodes_proximal_to_MS)
+	return salient_intermediate_nodes_proximal_to_MS
+
+
+def get_starting_compound_nodes():
+	GLM_significant_compounds_mapped_to_SPOKE = get_significant_compounds_with_disease_association(compound_type, sample, sel_sheet_index, data_path, pvalue_thresh=pvalue_thresh)
+	GLM_significant_compounds_mapped_to_SPOKE.spoke_identifer = "Compound:" + GLM_significant_compounds_mapped_to_SPOKE.spoke_identifer
+	starting_compound_nodes = GLM_significant_compounds_mapped_to_SPOKE.spoke_identifer.unique()
+	return starting_compound_nodes
+
+
+if __name__ == "__main__":
+	main()
 
 
 
