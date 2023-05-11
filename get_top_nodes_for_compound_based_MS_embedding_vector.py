@@ -85,23 +85,23 @@ def get_top_nodes_for_the_nodetype(sel_nodetype):
 	return top_nodes_dict
 
 
-def get_shortest_path_to_disease_node(df, mean_, std_):
+def get_shortest_path_to_disease_node(df_, mean_, std_):
 	shortest_pathlength_list = []
 	shortest_pathlength_p_value_list = []
-	for index, row in df.iterrows():
+	for index, row in df_.iterrows():
 		source_node = row["node_type"] + ":" + row["node_id"]
 		try:
 			shortest_pathlength = nx.shortest_path_length(G, source=source_node, target=destination_disease_node)
 			z_score = (shortest_pathlength - mean_) / std_
-			p_value = norm.sf(abs(z_score))
+			p_value = norm.cdf(z_score)
 		except:
 			shortest_pathlength = None
 			p_value = None
 		shortest_pathlength_list.append(shortest_pathlength)
 		shortest_pathlength_p_value_list.append(p_value)
-	df["shortest_pathlength_to_MS_disease_node"] = shortest_pathlength_list
-	df["p_value"] = shortest_pathlength_p_value_list
-	return df
+	df_["shortest_pathlength_to_MS_disease_node"] = shortest_pathlength_list
+	df_["p_value"] = shortest_pathlength_p_value_list
+	return df_
 
 
 if __name__ == "__main__":
