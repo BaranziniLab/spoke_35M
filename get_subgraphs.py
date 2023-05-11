@@ -44,12 +44,15 @@ def main():
 
 
 def get_paths_from_intermediate_nodes_to_MS_node(salient_intermediate_nodes_proximal_to_MS, destination_disease_node):
-	p = mp.Pool(NCORES)
-	args = zip(list(salient_intermediate_nodes_proximal_to_MS), [destination_disease_node]*len(salient_intermediate_nodes_proximal_to_MS))
-	intermediate_nodes_to_MS_node_paths_list = p.starmap(get_shortest_path, args)
-	p.close()
-	p.join()
-	intermediate_nodes_to_MS_node_paths = pd.concat(intermediate_nodes_to_MS_node_paths_list, ignore_index=True).drop_duplicates()
+	intermediate_nodes_to_MS_node_paths = {}
+	for salient_intermediate_nodes_proximal_to_MS_ in salient_intermediate_nodes_proximal_to_MS:
+		intermediate_nodes_to_MS_node_paths[salient_intermediate_nodes_proximal_to_MS_] = get_shortest_path(salient_intermediate_nodes_proximal_to_MS_, destination_disease_node)
+	# p = mp.Pool(NCORES)
+	# args = zip(list(salient_intermediate_nodes_proximal_to_MS), [destination_disease_node]*len(salient_intermediate_nodes_proximal_to_MS))
+	# intermediate_nodes_to_MS_node_paths_list = p.starmap(get_shortest_path, args)
+	# p.close()
+	# p.join()
+	# intermediate_nodes_to_MS_node_paths = pd.concat(intermediate_nodes_to_MS_node_paths_list, ignore_index=True).drop_duplicates()
 	return intermediate_nodes_to_MS_node_paths
 
 
