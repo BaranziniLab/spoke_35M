@@ -30,7 +30,7 @@ def main():
 	salient_intermediate_nodes_proximal_to_MS = get_salient_intermediate_nodes_proximal_to_MS()    
 	intermediate_nodes_to_MS_node_paths = get_paths_from_intermediate_nodes_to_MS_node(salient_intermediate_nodes_proximal_to_MS, destination_disease_node)
 	compound_to_intermediate_paths = []
-    if compound_type == "targeted":
+	if compound_type == "targeted":
 		starting_compound_nodes = get_starting_compound_nodes()	
 		compound_to_intermediate_paths = get_paths_from_compound_to_intermediate_nodes(starting_compound_nodes, salient_intermediate_nodes_proximal_to_MS)	
 	extracted_path = {}
