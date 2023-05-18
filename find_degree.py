@@ -17,12 +17,13 @@ def main():
     with open(GRAPH_PATH, "rb") as f:
         G = pickle.load(f)
     node_prefix = "{}:".format(node_type)
-    s3_client = boto3.client('s3')
-    df = pd.DataFrame(columns=['node_id', 'degree'])
+    s3_client = boto3.client('s3')    
+    node_degree_list = []
     for node in G.nodes():
         if node.startswith(node_prefix):
             degree = G.degree(node)
-            df = df.append({'node_id': node, 'degree': degree}, ignore_index=True)
+            node_degree_list.append({'node_id': node, 'degree': degree})
+    df = pd.DataFrame(node_degree_list)
     csv_data = df.to_csv(index=False)
     s3_client.put_object(Body=csv_data, Bucket=bucket_name, Key=file_name)
     s3_client.close()
