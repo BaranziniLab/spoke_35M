@@ -12,6 +12,9 @@ GRAPH_PATH = sys.argv[1]
 TARGET_NODE = sys.argv[2]
 N_RANDOM_SOURCE_NODES = int(sys.argv[3])
 NCORES = int(sys.argv[4])
+BUCKET_NAME = sys.argv[5]
+PPR_FILE_LOCATION = sys.argv[6]
+EMBEDDING_ANALYSIS_FILE_LOCATION = sys.argv[7]
 
 
 def main():
@@ -19,8 +22,8 @@ def main():
 	start_time = time.time()
 	print("Reading PPR feature map from S3 ...")
 	s3_client = boto3.client('s3')
-	bucket_name = 'ic-spoke'
-	object_key = "spoke35M/spoke35M_converged_ppr/spoke35M_ppr_features.csv"
+	bucket_name = BUCKET_NAME
+	object_key = PPR_FILE_LOCATION + "/spoke35M_ppr_features.csv"
 	s3_object = s3_client.get_object(Bucket=bucket_name, Key=object_key)
 	feature_df = pd.read_csv(s3_object["Body"])
 	unique_nodetypes = feature_df.node_type.unique()
@@ -34,7 +37,7 @@ def main():
 	shortest_pathlength_list = p.map(get_shortest_pathlength_distribution, unique_nodetypes)
 	p.close()
 	p.join()
-	object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/shortest_pathLength_distributions_of_all_nodetypes_to_MS_node.pickle"
+	object_key = "{}/shortest_pathLength_distributions_of_all_nodetypes_to_MS_node.pickle".format(EMBEDDING_ANALYSIS_FILE_LOCATION)
 	binary_data = pickle.dumps(shortest_pathlength_list)
 	s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=binary_data)
 	s3_client.close()
