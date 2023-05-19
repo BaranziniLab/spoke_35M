@@ -9,6 +9,8 @@ import gzip
 
 
 GRAPH_PATH = sys.argv[1]
+BUCKET_NAME = sys.argv[2]
+FILE_LOCATION = sys.argv[3]
 
 node_list = ["Compound:inchikey:AAOVKJBEBIDNHE-UHFFFAOYSA-N"]
 
@@ -26,8 +28,8 @@ def main():
 	binary_data = pickle.dumps(features)
 	compressed_data = gzip.compress(binary_data)
 	s3_client = boto3.client('s3')
-	bucket_name = 'ic-spoke'
-	object_key = 'spoke35M/spoke35M_converged_ppr/ppr_features_dict_gzip_compressed'
+	bucket_name = BUCKET_NAME
+	object_key = '{}/ppr_features_dict_gzip_compressed'.format(FILE_LOCATION)
 	s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=compressed_data)
 	s3_client.close()
 	completion_time = round((time.time()-start_time)/(60),2)
