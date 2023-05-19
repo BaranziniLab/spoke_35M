@@ -10,7 +10,7 @@ sheet_name_list = ["Without outlier", "Without outlier-MS treated", "Without out
               "With outlier", "With outlier-MStreated", "With outlier-MS not treated"]
 
 
-def get_spoke_embedding(compound_type, sample, sel_sheet_index, data_path, pvalue_thresh=0.05):
+def get_spoke_embedding(compound_type, sample, sel_sheet_index, data_path, bucket_name, ppr_file_location, pvalue_thresh=0.05):
     GLM_significant_compounds_mapped_to_SPOKE = get_significant_compounds_with_disease_association(compound_type, sample, sel_sheet_index, data_path, pvalue_thresh=pvalue_thresh)
     spoke_embedding_dict = {}
     spoke_vector = 0
@@ -19,7 +19,7 @@ def get_spoke_embedding(compound_type, sample, sel_sheet_index, data_path, pvalu
         compound_id = "Compound:" + row["spoke_identifer"]
         if compound_id in compounds_with_pagerank:
             entry_point_count += 1
-            object_key = "spoke35M/spoke35M_converged_ppr/" + compound_id + "_dict.pickle"
+            object_key = ppr_file_location + "/" + compound_id + "_dict.pickle"
             spoke_embedding_data = read_pickle_file_from_s3(bucket_name, object_key)
             spoke_vector += row["disease_coeff"]*spoke_embedding_data["embedding"]            
     spoke_embedding_dict["compound_type"] = compound_type
