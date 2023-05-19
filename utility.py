@@ -11,6 +11,7 @@ sheet_name_list = ["Without outlier", "Without outlier-MS treated", "Without out
 
 
 def get_spoke_embedding(compound_type, sample, sel_sheet_index, data_path, bucket_name, ppr_file_location, pvalue_thresh=0.05):
+    compounds_with_pagerank = get_saved_compounds_with_pagerank(bucket_name, ppr_file_location)
     GLM_significant_compounds_mapped_to_SPOKE = get_significant_compounds_with_disease_association(compound_type, sample, sel_sheet_index, data_path, pvalue_thresh=pvalue_thresh)
     spoke_embedding_dict = {}
     spoke_vector = 0
