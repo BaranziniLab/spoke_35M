@@ -4,10 +4,11 @@ import pandas as pd
 import sys
 
 MAPPING_FILE = sys.argv[1]
+bucket_location = sys.argv[2]
 
 mapping_file_df = pd.read_csv(MAPPING_FILE)
 mapping_file_df["spoke_identifer"] = "Compound:" + mapping_file_df["spoke_identifer"]
-cmd = "aws s3 ls s3://ic-spoke/spoke35M/spoke35M_converged_ppr/"
+cmd = "aws s3 ls s3://{}".format(bucket_location)
 out = os.popen(cmd)
 out_list = out.read().split("\n")
 saved_compound_list = np.array([element for element in out_list if "Compound:inchikey:" in element])
