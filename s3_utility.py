@@ -13,8 +13,9 @@ def read_pickle_file_from_s3(bucket_name, object_key):
 
 
 
-def get_saved_compoundid_from_s3():
-	cmd = "aws s3 ls s3://ic-spoke/spoke35M/spoke35M_converged_ppr/"
+def get_saved_compoundid_from_s3(bucket_name, file_location):
+	bucket_location = bucket_name + "/" + file_location + "/"
+	cmd = "aws s3 ls s3://{}".format(bucket_location)
 	out = os.popen(cmd)
 	out_list = out.read().split("\n")
 	saved_compound_list = np.array([element for element in out_list if "Compound:inchikey:" in element])
@@ -22,25 +23,25 @@ def get_saved_compoundid_from_s3():
 	return saved_compound_list_
 
 
-def get_saved_compounds_with_no_pagerank():
-	saved_compound_list_ = get_saved_compoundid_from_s3()
+def get_saved_compounds_with_no_pagerank(bucket_name, file_location):
+	saved_compound_list_ = get_saved_compoundid_from_s3(bucket_name, file_location)
 	s3_client = boto3.client('s3')
-	bucket_name = 'ic-spoke'
+	bucket_name = bucket_name
 	compounds_with_no_pagerank = []
 	for node_id in saved_compound_list_:
-	  object_key = 'spoke35M/spoke35M_converged_ppr/{}_dict.pickle'.format(node_id)
+	  object_key = '{}/{}_dict.pickle'.format(file_location, node_id)
 	  response = s3_client.head_object(Bucket=bucket_name, Key=object_key)
 	  if response['ContentLength'] < 222:
 	    compounds_with_no_pagerank.append(node_id)
 	return compounds_with_no_pagerank
 
-def get_saved_compounds_with_pagerank():
-	saved_compound_list_ = get_saved_compoundid_from_s3()
+def get_saved_compounds_with_pagerank(bucket_name, file_location):
+	saved_compound_list_ = get_saved_compoundid_from_s3(bucket_name, file_location)
 	s3_client = boto3.client('s3')
-	bucket_name = 'ic-spoke'
+	bucket_name = bucket_name
 	compounds_with_pagerank = []
 	for node_id in saved_compound_list_:
-	  object_key = 'spoke35M/spoke35M_converged_ppr/{}_dict.pickle'.format(node_id)
+	  object_key = '{}/{}_dict.pickle'.format(file_location, node_id)
 	  response = s3_client.head_object(Bucket=bucket_name, Key=object_key)
 	  if response['ContentLength'] > 222:
 	    compounds_with_pagerank.append(node_id)

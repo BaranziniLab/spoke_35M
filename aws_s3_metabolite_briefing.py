@@ -7,8 +7,11 @@ from s3_utility import get_saved_compounds_with_no_pagerank
 
 GLOBAL_MAPPING_FILE = sys.argv[1]
 SHORTCHAIN_MAPPING_FILE = sys.argv[2]
+BUCKET_NAME = sys.argv[3]
+FILE_LOCATION = sys.argv[4]
 
-cmd = "aws s3 ls s3://ic-spoke/spoke35M/spoke35M_converged_ppr/"
+bucket_location = BUCKET_NAME + "/" + FILE_LOCATION + "/"
+cmd = "aws s3 ls s3://{}".format(bucket_location)
 out = os.popen(cmd)
 out_list = out.read().split("\n")
 saved_compound_list = np.array([element for element in out_list if "Compound:inchikey:" in element])
@@ -30,7 +33,7 @@ print("They are:")
 print(global_short_chain_shared_merge)
 
 print("Checking for saved compounds with no pagerank ...")
-compounds_with_no_pagerank = get_saved_compounds_with_no_pagerank()
+compounds_with_no_pagerank = get_saved_compounds_with_no_pagerank(BUCKET_NAME, FILE_LOCATION)
 print("There are {} Compounds with no pagerank".format(len(compounds_with_no_pagerank)))
 
 
