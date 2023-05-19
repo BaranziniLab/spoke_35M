@@ -24,3 +24,5 @@ def main():
 	completion_time = round((time.time()-start_time)/(60),2)
 	print("Completed in {} min".format(completion_time))
 
+if __name__ == "__main__":
+    main()
