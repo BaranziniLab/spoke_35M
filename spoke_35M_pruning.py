@@ -20,7 +20,8 @@ def main():
 	    G = pickle.load(f)
 	G_new = G.copy()
 	G_new.remove_nodes_from(compounds_to_remove)
-	nx.write_gpickle(G_new, os.path.join(data_path, 'spoke_35M_compound_pruned_version.gpickle'))
+	with open(os.path.join(data_path, 'spoke_35M_compound_pruned_version.gpickle'), 'wb') as f:
+		pickle.dump(G_new, f)
 	completion_time = round((time.time()-start_time)/(60),2)
 	print("Completed in {} min".format(completion_time))
 
