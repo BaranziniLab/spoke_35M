@@ -11,6 +11,8 @@ import os
 GRAPH_PATH = sys.argv[1]
 MAPPING_FILE = sys.argv[2]
 NCORES = int(sys.argv[3])
+bucket_name = sys.argv[4]
+sublocation = sys.argv[5]
 
 
 def main():
@@ -18,7 +20,7 @@ def main():
     global G
     mapping_file_df = pd.read_csv(MAPPING_FILE)
     mapping_file_df["spoke_identifer"] = "Compound:" + mapping_file_df["spoke_identifer"]
-    cmd = "aws s3 ls s3://ic-spoke/spoke35M/spoke35M_converged_ppr/"
+    cmd = "aws s3 ls s3://{}/{}/".format(bucket_name, sublocation)
     out = os.popen(cmd)
     out_list = out.read().split("\n")
     saved_compound_list = np.array([element for element in out_list if "Compound:inchikey:" in element])
@@ -66,8 +68,7 @@ def personalized_pagerank(node_id):
     binary_data = pickle.dumps(out_dict)
     del out_dict
     s3_client = boto3.client('s3')
-    bucket_name = 'ic-spoke'
-    object_key = 'spoke35M/spoke35M_converged_ppr/{}_dict.pickle'.format(node_id)
+    object_key = '{}/{}_dict.pickle'.format(sublocation, node_id)
     s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=binary_data)
     s3_client.close()
     del binary_data
