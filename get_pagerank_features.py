@@ -32,6 +32,7 @@ def main():
 	features.node_id = features.node_id.apply(lambda x:":".join(x.split(":")[1:]))
 	csv_data = features.to_csv(index=False)
 	file_name = "{}/spoke35M_ppr_features.csv".format(FILE_LOCATION)
+	s3_client = boto3.client('s3')
 	s3_client.put_object(Body=csv_data, Bucket=BUCKET_NAME, Key=file_name)
 
 	# binary_data = pickle.dumps(features)
