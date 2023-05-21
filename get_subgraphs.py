@@ -15,10 +15,12 @@ sel_sheet_index = int(sys.argv[3])
 data_path = sys.argv[4]
 GRAPH_PATH = sys.argv[5]
 NCORES = int(sys.argv[6])
+BUCKET_NAME = sys.argv[7]
+EMBEDDING_ANALYSIS_FILE_LOCATION = sys.argv[8]
 
 pvalue_thresh = 0.05
 destination_disease_node = "Disease:DOID:2377"
-bucket_name = 'ic-spoke'
+bucket_name = BUCKET_NAME
 
 
 def main():
@@ -38,7 +40,7 @@ def main():
 	extracted_path["intermediate_to_MS"] = intermediate_nodes_to_MS_node_paths
 	binary_data = pickle.dumps(extracted_path)
 	filename = "extracted_paths_for_" + compound_type + "_compounds_" + sample + "_sample_" + "sheet_index_" + str(sel_sheet_index) + "_dict.pickle"
-	object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/{}".format(filename)
+	object_key = "{}/{}".format(EMBEDDING_ANALYSIS_FILE_LOCATION, filename)
 	s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=binary_data)
 	s3_client.close()
 	completion_time = round((time.time()-start_time)/(60),2)
@@ -81,7 +83,7 @@ def get_shortest_path(source, target):
 
 def get_salient_intermediate_nodes_proximal_to_MS():
 	filename = "top_nodes_for_each_nodetype_for_" + compound_type + "_compounds_" + sample + "_sample_" + "sheet_index_" + str(sel_sheet_index) + "_list.pickle"
-	object_key = "spoke35M/spoke35M_iMSMS_embedding_analysis/{}".format(filename)
+	object_key = "{}/{}".format(EMBEDDING_ANALYSIS_FILE_LOCATION, filename)
 	response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
 	top_nodes_list_of_dict = pickle.loads(response['Body'].read())
 	salient_intermediate_nodes_proximal_to_MS = []
