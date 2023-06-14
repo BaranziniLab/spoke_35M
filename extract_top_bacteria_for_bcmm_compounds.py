@@ -41,7 +41,7 @@ def main():
 		concatenated_dict.update(dictionary)
 	json_data = json.dumps(concatenated_dict)
 	s3_client = boto3.client('s3')
-	file_name = SAVE_LOCATION + "/" "bcmm_compounds_top_bacteria.json"
+	file_name = SAVE_LOCATION + "/bcmm_compounds_top_bacteria.json"
 	s3_client.put_object(Body=json_data, Bucket=BUCKET_NAME, Key=file_name)
 	completion_time = round((time.time()-start_time)/(60),2)
 	print("Completed and saved in {} min".format(completion_time))
