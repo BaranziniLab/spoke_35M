@@ -3,6 +3,7 @@ import boto3
 import pickle
 import os
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
 
