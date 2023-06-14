@@ -24,7 +24,7 @@ bacteria_df["type_id"] = "Organism:" + bacteria_df["spoke_identifier"].astype(st
 
 
 def main():
-	global bacteria_feature_df_with_names
+	global bacteria_feature_df_with_names, bacteria_feature_indices
 	start_time = time.time()
 	feature_df = get_feature_map()
 	feature_df["type_id"] = feature_df["node_type"] + ":" + feature_df["node_id"]
