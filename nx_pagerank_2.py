@@ -14,14 +14,19 @@ IDENTIFIER_COLUMN = sys.argv[3]
 NCORES = int(sys.argv[4])
 bucket_name = sys.argv[5]
 sublocation = sys.argv[6]
+check_existing_compounds = int(sys.argv[7])
 
 
 def main():
     start_time = time.time()
     global G
-    mapping_file_df = pd.read_csv(MAPPING_FILE)
-    mapping_file_df.dropna(subset=[IDENTIFIER_COLUMN], inplace=True)
-    node_list = list(mapping_file_df[IDENTIFIER_COLUMN].unique())
+    if check_existing_compounds == 1:
+        bucket_location = bucket_name + "/" + sublocation + "/"
+        node_list = compare_saved_ppr(MAPPING_FILE, IDENTIFIER_COLUMN, bucket_location)
+    else:
+        mapping_file_df = pd.read_csv(MAPPING_FILE)
+        mapping_file_df.dropna(subset=[IDENTIFIER_COLUMN], inplace=True)
+        node_list = list(mapping_file_df[IDENTIFIER_COLUMN].unique())
 
     with open(GRAPH_PATH, "rb") as f:
         G = pickle.load(f)

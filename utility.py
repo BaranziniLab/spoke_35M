@@ -71,3 +71,16 @@ def get_significant_compounds_with_disease_association(compound_type, sample, se
         GLM_out_total_significant_compounds_mapped_to_SPOKE = pd.merge(GLM_out_total_significant_compounds, compound_spoke_map, left_on="analyte_name", right_on="name")[["disease_coeff", "spoke_identifer"]]
         GLM_out_total_significant_compounds_mapped_to_SPOKE.drop_duplicates(inplace=True)
         return GLM_out_total_significant_compounds_mapped_to_SPOKE
+
+
+def compare_saved_ppr(MAPPING_FILE, IDENTIFIER_COLUMN, bucket_location):
+    mapping_file_df = pd.read_csv(MAPPING_FILE)
+    mapping_file_df[IDENTIFIER_COLUMN] = "Compound:" + mapping_file_df[IDENTIFIER_COLUMN]
+    cmd = "aws s3 ls s3://{}".format(bucket_location)
+    out = os.popen(cmd)
+    out_list = out.read().split("\n")
+    saved_compound_list = np.array([element for element in out_list if "Compound:inchikey:" in element])
+    saved_compound_list_ = ['Compound:inchikey:' + element.split("Compound:inchikey:")[-1].replace('_dict.pickle', '') for element in saved_compound_list if "Compound:inchikey:" in element]
+    node_list = mapping_file_df[IDENTIFIER_COLUMN].unique()
+    node_list = list(set(node_list) - set(saved_compound_list_))
+    return node_list
