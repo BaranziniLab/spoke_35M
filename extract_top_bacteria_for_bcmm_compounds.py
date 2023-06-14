@@ -1,6 +1,7 @@
 import sys
 import boto3
 import pandas as pd
+import numpy as np
 from scipy import stats
 import multiprocessing as mp
 import time
@@ -57,13 +58,16 @@ def get_top_N_bacteria_for_the_compound(item):
 		object_key = PPR_FILE_LOCATION + "/" + compound_id + "_dict.pickle"
 		spoke_embedding_data = read_pickle_file_from_s3(BUCKET_NAME, object_key)
 		spoke_vector += spoke_embedding_data["embedding"]
-	spoke_bacteria_vector = spoke_vector[bacteria_feature_indices]
-	bacteria_feature_df_with_names_["ppr_values"] = spoke_bacteria_vector
-	bacteria_feature_df_with_names_["ppr_percentile"] = bacteria_feature_df_with_names_.ppr_values.apply(lambda x:stats.percentileofscore(bacteria_feature_df_with_names_.ppr_values, x))/100
-	bacteria_feature_df_with_names_top_N = bacteria_feature_df_with_names_.sort_values(by="ppr_percentile", ascending=False).head(N)
-	bacteria_feature_df_with_names_top_N.drop("ppr_values", axis=1, inplace=True)
-	bacteria_feature_df_with_names_top_N.rename(columns={"spoke_identifier":"ncbi_id", "spoke_name": "name", "ppr_percentile":"percentile_score"}, inplace=True)
-	out[item] = bacteria_feature_df_with_names_top_N.to_dict('records')
+	try:
+		spoke_bacteria_vector = spoke_vector[bacteria_feature_indices]
+		bacteria_feature_df_with_names_["ppr_values"] = spoke_bacteria_vector
+		bacteria_feature_df_with_names_["ppr_percentile"] = bacteria_feature_df_with_names_.ppr_values.apply(lambda x:stats.percentileofscore(bacteria_feature_df_with_names_.ppr_values, x))/100
+		bacteria_feature_df_with_names_top_N = bacteria_feature_df_with_names_.sort_values(by="ppr_percentile", ascending=False).head(N)
+		bacteria_feature_df_with_names_top_N.drop("ppr_values", axis=1, inplace=True)
+		bacteria_feature_df_with_names_top_N.rename(columns={"spoke_identifier":"ncbi_id", "spoke_name": "name", "ppr_percentile":"percentile_score"}, inplace=True)
+		out[item] = bacteria_feature_df_with_names_top_N.to_dict('records')		
+	except:
+		out[item] = []
 	return out
 
 def get_feature_map():
