@@ -22,16 +22,16 @@ compound_names = mapping_file_df["compound_name"].unique()
 bacteria_df = pd.read_csv(BACTERIA_FILE, sep="\t")
 bacteria_df["type_id"] = "Organism:" + bacteria_df["spoke_identifier"].astype(str)
 
-feature_df = get_feature_map()
-feature_df["type_id"] = feature_df["node_type"] + ":" + feature_df["node_id"]
-bacteria_feature_df = feature_df[feature_df["type_id"].isin(bacteria_df.type_id.unique())]
-bacteria_feature_df_with_names = pd.merge(bacteria_feature_df, bacteria_df, on="type_id")
-bacteria_feature_df_with_names = bacteria_feature_df_with_names[["spoke_identifier", "spoke_name"]]
-bacteria_feature_indices = bacteria_feature_df.index.values
-
 
 def main():
+	global bacteria_feature_df_with_names
 	start_time = time.time()
+	feature_df = get_feature_map()
+	feature_df["type_id"] = feature_df["node_type"] + ":" + feature_df["node_id"]
+	bacteria_feature_df = feature_df[feature_df["type_id"].isin(bacteria_df.type_id.unique())]
+	bacteria_feature_df_with_names = pd.merge(bacteria_feature_df, bacteria_df, on="type_id")
+	bacteria_feature_df_with_names = bacteria_feature_df_with_names[["spoke_identifier", "spoke_name"]]
+	bacteria_feature_indices = bacteria_feature_df.index.values
 	p = mp.Pool(NCORES)
 	out_list_of_dict = p.map(get_top_N_bacteria_for_the_compound, compound_names)
 	p.close()
@@ -76,4 +76,3 @@ def get_feature_map():
 if __name__ == "__main__":
 	main()
 
-	
