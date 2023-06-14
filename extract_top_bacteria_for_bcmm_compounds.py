@@ -15,8 +15,7 @@ BUCKET_NAME = sys.argv[3]
 PPR_FILE_LOCATION = sys.argv[4]
 SAVE_LOCATION = sys.argv[5]
 NCORES = int(sys.argv[6])
-
-N = 25
+N = int(sys.argv[7])
 
 mapping_file_df = pd.read_csv(MAPPING_FILE)
 compound_names = mapping_file_df["compound_name"].unique()
