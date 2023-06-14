@@ -57,7 +57,8 @@ def get_top_N_bacteria_for_the_compound(item):
 	for compound_id in spoke_compound_nodes_ids:
 		object_key = PPR_FILE_LOCATION + "/" + compound_id + "_dict.pickle"
 		spoke_embedding_data = read_pickle_file_from_s3(BUCKET_NAME, object_key)
-		spoke_vector += spoke_embedding_data["embedding"]
+		if spoke_embedding_data["embedding"].shape[0] != 0:
+			spoke_vector += spoke_embedding_data["embedding"]		
 	try:
 		spoke_bacteria_vector = spoke_vector[bacteria_feature_indices]
 		bacteria_feature_df_with_names_["ppr_values"] = spoke_bacteria_vector
