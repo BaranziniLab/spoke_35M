@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import boto3
 import os
+from utility import compare_saved_ppr
 
 GRAPH_PATH = sys.argv[1]
 MAPPING_FILE = sys.argv[2]
