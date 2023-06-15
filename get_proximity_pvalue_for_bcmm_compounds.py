@@ -21,7 +21,7 @@ JSON_FILE_LOCATION = sys.argv[6]
 PPR_FILE_LOCATION = sys.argv[7]
 NCORES = int(sys.argv[8])
 
-N_RANDOM_BACTERIA_NODES = 1000
+N_RANDOM_BACTERIA_NODES = 3000
 
 s3_client = boto3.client("s3")
 response = s3_client.get_object(Bucket=BUCKET_NAME, Key=JSON_FILE_LOCATION)
@@ -37,6 +37,7 @@ saved_compounds_with_pagerank = get_saved_compounds_with_pagerank(BUCKET_NAME, P
 random_bacteria_nodes = random.sample(list(bacteria_df.type_id.unique()), N_RANDOM_BACTERIA_NODES)
 
 def main():
+	global G
 	start_time = time.time()
 	with open(GRAPH_PATH, "rb") as f:
 		G = pickle.load(f)
@@ -67,7 +68,6 @@ def get_proximity_pvalue(item):
 		if spoke_id in saved_compounds_with_pagerank:			
 			bacteria_shortest_path_length_list = []		
 			for source_node in random_bacteria_nodes:
-				# print("{}/{}".format(index+1, len(random_bacteria_nodes)))
 				try:
 					shortest_pathlength = nx.shortest_path_length(G, source=source_node, target=spoke_id)
 				except:
