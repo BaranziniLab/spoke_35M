@@ -19,9 +19,9 @@ BUCKET_NAME = sys.argv[4]
 SAVE_LOCATION = sys.argv[5]
 JSON_FILE_LOCATION = sys.argv[6]
 PPR_FILE_LOCATION = sys.argv[7]
-N_RANDOM_BACTERIA_NODES = int(sys.argv[8])
-NCORES = int(sys.argv[9])
+NCORES = int(sys.argv[8])
 
+N_RANDOM_BACTERIA_NODES = 1000
 
 s3_client = boto3.client("s3")
 response = s3_client.get_object(Bucket=BUCKET_NAME, Key=JSON_FILE_LOCATION)
@@ -67,6 +67,7 @@ def get_proximity_pvalue(item):
 		if spoke_id in saved_compounds_with_pagerank:			
 			bacteria_shortest_path_length_list = []		
 			for source_node in random_bacteria_nodes:
+				# print("{}/{}".format(index+1, len(random_bacteria_nodes)))
 				try:
 					shortest_pathlength = nx.shortest_path_length(G, source=source_node, target=spoke_id)
 				except:
