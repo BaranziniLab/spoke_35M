@@ -87,6 +87,8 @@ def get_proximity_pvalue(item):
 				p_value_list_.append(p_value)
 			p_value_list.append(p_value_list_)
 	p_value_df = pd.DataFrame(p_value_list)
+	print(p_value_df)
+	sys.exit(0)
 	out = {}
 	out[item] = top_bacteria_data[item]
 	for index, p_value_item in enumerate(np.array(p_value_df.min())):
