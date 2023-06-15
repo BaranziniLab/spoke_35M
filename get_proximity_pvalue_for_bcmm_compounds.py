@@ -41,16 +41,19 @@ def main():
 	with open(GRAPH_PATH, "rb") as f:
 		G = pickle.load(f)
 	p = mp.Pool(NCORES)
-	p.map(get_proximity_pvalue, compound_names)
+	out_list_of_dict = p.map(get_proximity_pvalue, compound_names)
 	p.close()
 	p.join()
-	json_data = json.dumps(top_bacteria_data)
+	concatenated_dict = {}
+	for dictionary in out_list_of_dict:
+		concatenated_dict.update(dictionary)
+	json_data = json.dumps(concatenated_dict)
 	s3_client = boto3.client('s3')
 	file_name = SAVE_LOCATION + "/bcmm_compounds_top_bacteria_with_proximity_score.json"
 	s3_client.put_object(Body=json_data, Bucket=BUCKET_NAME, Key=file_name)
 	completion_time = round((time.time()-start_time)/(60),2)
 	print("Completed and saved in {} min".format(completion_time))
-	
+
 
 def get_proximity_pvalue(item):
 	mapping_file_df_sub = mapping_file_df[mapping_file_df["compound_name"]==item]
@@ -83,8 +86,11 @@ def get_proximity_pvalue(item):
 				p_value_list_.append(p_value)
 			p_value_list.append(p_value_list_)
 	p_value_df = pd.DataFrame(p_value_list)
+	out = {}
+	out[item] = top_bacteria_data[item]
 	for index, p_value_item in enumerate(np.array(p_value_df.min())):
-		top_bacteria_data[item][index]["proximity_pvalue"] = p_value_item
+		out[item][index]["proximity_pvalue"] = p_value_item
+	return out
 
 
 if __name__ == "__main__":
