@@ -41,10 +41,9 @@ def main():
 	start_time = time.time()
 	with open(GRAPH_PATH, "rb") as f:
 		G = pickle.load(f)
-	p = mp.Pool(NCORES)
-	out_list_of_dict = p.map(get_proximity_pvalue, compound_names)
-	p.close()
-	p.join()
+	out_list_of_dict = []
+	for compound_name in compound_names:
+		out_list_of_dict.append(get_proximity_pvalue(compound_name))
 	concatenated_dict = {}
 	for dictionary in out_list_of_dict:
 		concatenated_dict.update(dictionary)
@@ -56,6 +55,14 @@ def main():
 	print("Completed and saved in {} min".format(completion_time))
 
 
+def get_shortest_pathlength(source, target):
+	try:
+		shortest_pathlength = nx.shortest_path_length(G, source=source, target=target)
+	except:
+		shortest_pathlength = None
+	return shortest_pathlength
+
+
 def get_proximity_pvalue(item):
 	mapping_file_df_sub = mapping_file_df[mapping_file_df["compound_name"]==item]
 	spoke_ids = mapping_file_df_sub.spoke_identifier.unique()
@@ -65,14 +72,12 @@ def get_proximity_pvalue(item):
 		top_bacteria_list.append("Organism:" + str(item_["ncbi_id"]))
 	p_value_list = []
 	for spoke_id in spoke_ids:
-		if spoke_id in saved_compounds_with_pagerank:			
-			bacteria_shortest_path_length_list = []		
-			for source_node in random_bacteria_nodes:
-				try:
-					shortest_pathlength = nx.shortest_path_length(G, source=source_node, target=spoke_id)
-				except:
-					shortest_pathlength = None
-				bacteria_shortest_path_length_list.append(shortest_pathlength)
+		if spoke_id in saved_compounds_with_pagerank:
+			p = mp.Pool(NCORES)
+			args_list_of_tuples = list(zip(random_bacteria_nodes, [spoke_id]*len(random_bacteria_nodes)))										
+			bacteria_shortest_path_length_list = p.starmap(get_shortest_pathlength, args_list_of_tuples)			
+			p.close()
+			p.join()			
 			bacteria_shortest_path_length_distribution_none_removed = [x for x in bacteria_shortest_path_length_list if x is not None]
 			bacteria_shortest_path_length_distribution_none_removed_mean = np.mean(bacteria_shortest_path_length_distribution_none_removed)
 			bacteria_shortest_path_length_distribution_none_removed_std = np.std(bacteria_shortest_path_length_distribution_none_removed)
@@ -87,8 +92,6 @@ def get_proximity_pvalue(item):
 				p_value_list_.append(p_value)
 			p_value_list.append(p_value_list_)
 	p_value_df = pd.DataFrame(p_value_list)
-	print(p_value_df)
-	sys.exit(0)
 	out = {}
 	out[item] = top_bacteria_data[item]
 	for index, p_value_item in enumerate(np.array(p_value_df.min())):
