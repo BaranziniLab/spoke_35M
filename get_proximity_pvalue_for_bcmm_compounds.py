@@ -9,7 +9,7 @@ import networkx as nx
 from scipy.stats import norm
 import multiprocessing as mp
 import time
-from s3_utility import get_saved_compounds_with_pagerank
+from s3_utility import read_pickle_file_from_s3
 
 
 GRAPH_PATH = sys.argv[1]
@@ -33,7 +33,7 @@ mapping_file_df = pd.read_csv(MAPPING_FILE)
 bacteria_df = pd.read_csv(BACTERIA_FILE, sep="\t")
 bacteria_df["type_id"] = "Organism:" + bacteria_df["spoke_identifier"].astype(str)
 
-saved_compounds_with_pagerank = get_saved_compounds_with_pagerank(BUCKET_NAME, PPR_FILE_LOCATION)
+# saved_compounds_with_pagerank = get_saved_compounds_with_pagerank(BUCKET_NAME, PPR_FILE_LOCATION)
 random_bacteria_nodes = random.sample(list(bacteria_df.type_id.unique()), N_RANDOM_BACTERIA_NODES)
 
 def main():
@@ -72,7 +72,9 @@ def get_proximity_pvalue(item):
 		top_bacteria_list.append("Organism:" + str(item_["ncbi_id"]))
 	p_value_list = []
 	for spoke_id in spoke_ids:
-		if spoke_id in saved_compounds_with_pagerank:
+		object_key = PPR_FILE_LOCATION + "/" + spoke_id + "_dict.pickle"
+		spoke_embedding_data = read_pickle_file_from_s3(BUCKET_NAME, object_key)
+		if spoke_embedding_data["embedding"].shape[0] != 0:
 			p = mp.Pool(NCORES)
 			args_list_of_tuples = list(zip(random_bacteria_nodes, [spoke_id]*len(random_bacteria_nodes)))										
 			bacteria_shortest_path_length_list = p.starmap(get_shortest_pathlength, args_list_of_tuples)			
