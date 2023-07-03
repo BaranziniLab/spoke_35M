@@ -52,7 +52,9 @@ def main():
 def get_all_bacteria_for_the_compound(item):
 	out = {}
 	bacteria_feature_df_with_names_ = bacteria_feature_df_with_names.copy()
+	bacteria_feature_df_with_names_["type_id"] = "Organism:" + bacteria_feature_df_with_names_["spoke_identifier"].astype(str)
 	bacteria_list = list(bacteria_feature_df_with_names_["type_id"])
+	bacteria_feature_df_with_names_.drop("type_id", axis=1, inplace=True)
 	spoke_compound_nodes_ids = list(mapping_file_df[mapping_file_df["compound_name"]==item].spoke_identifier.unique())
 	spoke_compound_nodes_ids = list(map(lambda x:"Compound:"+x, spoke_compound_nodes_ids))
 	spoke_vector = 0
@@ -92,7 +94,7 @@ def get_feature_map():
 	s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=object_key)
 	feature_df = pd.read_csv(s3_object["Body"])
 	return feature_df
-	
+
 
 if __name__ == "__main__":
 	main()
