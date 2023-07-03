@@ -6,27 +6,29 @@ from scipy import stats
 import multiprocessing as mp
 import time
 import json
+import pickle
 import networkx as nx
 from s3_utility import read_pickle_file_from_s3
 
-
-MAPPING_FILE = sys.argv[1]
-BACTERIA_FILE = sys.argv[2]
-BUCKET_NAME = sys.argv[3]
-PPR_FILE_LOCATION = sys.argv[4]
-SAVE_LOCATION = sys.argv[5]
-NCORES = int(sys.argv[6])
+GRAPH_PATH = sys.argv[1]
+MAPPING_FILE = sys.argv[2]
+BACTERIA_FILE = sys.argv[3]
+BUCKET_NAME = sys.argv[4]
+PPR_FILE_LOCATION = sys.argv[5]
+SAVE_LOCATION = sys.argv[6]
+NCORES = int(sys.argv[7])
 
 
 mapping_file_df = pd.read_csv(MAPPING_FILE)
 compound_names = mapping_file_df["compound_name"].unique()
 bacteria_df = pd.read_csv(BACTERIA_FILE, sep="\t")
 bacteria_df["type_id"] = "Organism:" + bacteria_df["spoke_identifier"].astype(str)
-merged_out_df = pd.DataFrame(columns=["ncbi_id", "name"])
 
 def main():
-	global bacteria_feature_df_with_names, bacteria_feature_indices
+	global bacteria_feature_df_with_names, bacteria_feature_indices, G
 	start_time = time.time()
+	with open(GRAPH_PATH, "rb") as f:
+		G = pickle.load(f)
 	feature_df = get_feature_map()
 	feature_df["type_id"] = feature_df["node_type"] + ":" + feature_df["node_id"]
 	bacteria_feature_df = feature_df[feature_df["type_id"].isin(bacteria_df.type_id.unique())]
@@ -37,6 +39,7 @@ def main():
 	out_list_of_df = p.map(get_all_bacteria_for_the_compound, compound_names)
 	p.close()
 	p.join()
+	merged_out_df = pd.DataFrame(columns=["ncbi_id", "name"])
 	for df in out_list_of_df:
 	    merged_df = pd.merge(merged_out_df, df, on=["ncbi_id", "name"], how="outer")
 
@@ -50,7 +53,6 @@ def main():
 
 
 def get_all_bacteria_for_the_compound(item):
-	out = {}
 	bacteria_feature_df_with_names_ = bacteria_feature_df_with_names.copy()
 	bacteria_feature_df_with_names_["type_id"] = "Organism:" + bacteria_feature_df_with_names_["spoke_identifier"].astype(str)
 	bacteria_list = list(bacteria_feature_df_with_names_["type_id"])
@@ -67,8 +69,9 @@ def get_all_bacteria_for_the_compound(item):
 			shortest_pathlength_list_ = []
 			for bacteria in bacteria_list:
 				shortest_pathlength_list_.append(get_shortest_pathlength(bacteria, compound_id))
-			shortest_pathlength_list.append(shortest_pathlength_list_)
+			shortest_pathlength_list.append(shortest_pathlength_list_)			
 	try:
+		shortest_pathlength_list = [list(pair) for pair in zip(*shortest_pathlength_list)]
 		spoke_bacteria_vector = spoke_vector[bacteria_feature_indices]
 		bacteria_feature_df_with_names_["ppr_values"] = spoke_bacteria_vector
 		bacteria_feature_df_with_names_["ppr_percentile"] = bacteria_feature_df_with_names_.ppr_values.apply(lambda x:stats.percentileofscore(bacteria_feature_df_with_names_.ppr_values, x))/100
