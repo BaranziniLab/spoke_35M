@@ -40,13 +40,13 @@ def main():
 	for df in out_list_of_df:
 	    merged_df = pd.merge(merged_out_df, df, on=["ncbi_id", "name"], how="outer")
 
-    s3_client = boto3.client('s3')
-    file_name = SAVE_LOCATION + "/bcmm_compounds_all_bacteria.csv"
-    csv_data = merged_df.to_csv(index=False)
-    s3_client.put_object(Body=csv_data, Bucket=BUCKET_NAME, Key=file_name)
-    s3_client.close()
-    completion_time = round((time.time()-start_time)/(60),2)
-    print("Completed in {} min!".format(completion_time))
+	s3_client = boto3.client('s3')
+	file_name = SAVE_LOCATION + "/bcmm_compounds_all_bacteria.csv"
+	csv_data = merged_df.to_csv(index=False)
+	s3_client.put_object(Body=csv_data, Bucket=BUCKET_NAME, Key=file_name)
+	s3_client.close()
+	completion_time = round((time.time()-start_time)/(60),2)
+	print("Completed in {} min!".format(completion_time))
 
 
 def get_all_bacteria_for_the_compound(item):
