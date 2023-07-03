@@ -86,7 +86,14 @@ def get_shortest_pathlength(source, target):
 	return shortest_pathlength
 
 
+def get_feature_map():
+	s3_client = boto3.client('s3')
+	object_key = PPR_FILE_LOCATION + "/spoke35M_ppr_features.csv"
+	s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=object_key)
+	feature_df = pd.read_csv(s3_object["Body"])
+	return feature_df
+	
+
 if __name__ == "__main__":
 	main()
 
-	
