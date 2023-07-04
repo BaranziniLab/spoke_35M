@@ -21,6 +21,7 @@ NCORES = int(sys.argv[7])
 
 mapping_file_df = pd.read_csv(MAPPING_FILE)
 compound_names = mapping_file_df["compound_name"].unique()
+compound_names = compound_names[0:5]
 bacteria_df = pd.read_csv(BACTERIA_FILE, sep="\t")
 bacteria_df["type_id"] = "Organism:" + bacteria_df["spoke_identifier"].astype(str)
 
@@ -35,8 +36,7 @@ def main():
 	bacteria_feature_df_with_names = pd.merge(bacteria_feature_df, bacteria_df, on="type_id")
 	bacteria_feature_df_with_names = bacteria_feature_df_with_names[["spoke_identifier", "spoke_name"]]
 	bacteria_feature_indices = bacteria_feature_df.index.values
-	p = mp.Pool(NCORES)
-	compound_names = compound_names[0:5]
+	p = mp.Pool(NCORES)	
 	out_list_of_df = p.map(get_all_bacteria_for_the_compound, compound_names)
 	print(len(out_list_of_df))
 	print(out_list_of_df)
