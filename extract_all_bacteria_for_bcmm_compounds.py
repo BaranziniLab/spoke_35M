@@ -36,18 +36,21 @@ def main():
 	bacteria_feature_df_with_names = bacteria_feature_df_with_names[["spoke_identifier", "spoke_name"]]
 	bacteria_feature_indices = bacteria_feature_df.index.values
 	p = mp.Pool(NCORES)
+	compound_names = compound_names[0:5]
 	out_list_of_df = p.map(get_all_bacteria_for_the_compound, compound_names)
+	print(len(out_list_of_df))
+	print(out_list_of_df)
 	p.close()
 	p.join()
-	merged_out_df = pd.DataFrame(columns=["ncbi_id", "name"])
-	for df in out_list_of_df:
-	    merged_df = pd.merge(merged_out_df, df, on=["ncbi_id", "name"], how="outer")
+	# merged_out_df = pd.DataFrame(columns=["ncbi_id", "name"])
+	# for df in out_list_of_df:
+	#     merged_df = pd.merge(merged_out_df, df, on=["ncbi_id", "name"], how="outer")
 
-	s3_client = boto3.client('s3')
-	file_name = SAVE_LOCATION + "/bcmm_compounds_all_bacteria.csv"
-	csv_data = merged_df.to_csv(index=False)
-	s3_client.put_object(Body=csv_data, Bucket=BUCKET_NAME, Key=file_name)
-	s3_client.close()
+	# s3_client = boto3.client('s3')
+	# file_name = SAVE_LOCATION + "/bcmm_compounds_all_bacteria.csv"
+	# csv_data = merged_df.to_csv(index=False)
+	# s3_client.put_object(Body=csv_data, Bucket=BUCKET_NAME, Key=file_name)
+	# s3_client.close()
 	completion_time = round((time.time()-start_time)/(60),2)
 	print("Completed in {} min!".format(completion_time))
 
