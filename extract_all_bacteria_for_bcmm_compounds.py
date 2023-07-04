@@ -21,7 +21,6 @@ NCORES = int(sys.argv[7])
 
 mapping_file_df = pd.read_csv(MAPPING_FILE)
 compound_names = mapping_file_df["compound_name"].unique()
-compound_names = compound_names[0:5]
 bacteria_df = pd.read_csv(BACTERIA_FILE, sep="\t")
 bacteria_df["type_id"] = "Organism:" + bacteria_df["spoke_identifier"].astype(str)
 
@@ -38,19 +37,14 @@ def main():
 	bacteria_feature_indices = bacteria_feature_df.index.values
 	p = mp.Pool(NCORES)	
 	out_list_of_df = p.map(get_all_bacteria_for_the_compound, compound_names)
-	print(len(out_list_of_df))
-	print(out_list_of_df)
 	p.close()
 	p.join()
-	# merged_out_df = pd.DataFrame(columns=["ncbi_id", "name"])
-	# for df in out_list_of_df:
-	#     merged_df = pd.merge(merged_out_df, df, on=["ncbi_id", "name"], how="outer")
 
-	# s3_client = boto3.client('s3')
-	# file_name = SAVE_LOCATION + "/bcmm_compounds_all_bacteria.csv"
-	# csv_data = merged_df.to_csv(index=False)
-	# s3_client.put_object(Body=csv_data, Bucket=BUCKET_NAME, Key=file_name)
-	# s3_client.close()
+	s3_client = boto3.client('s3')
+	file_name = SAVE_LOCATION + "/bcmm_compounds_all_bacteria.pickle"
+	binary_data = pickle.dumps(out_list_of_df)
+	s3_client.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=binary_data)
+	s3_client.close()
 	completion_time = round((time.time()-start_time)/(60),2)
 	print("Completed in {} min!".format(completion_time))
 
