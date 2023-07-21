@@ -5,6 +5,7 @@ import pickle
 import os
 import sys
 import time
+import networkx as nx
 from s3_utility import read_pickle_file_from_s3
 
 
