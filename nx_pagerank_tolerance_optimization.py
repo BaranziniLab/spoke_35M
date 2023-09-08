@@ -10,7 +10,7 @@ max_iter = int(sys.argv[2])
 tol = float(sys.argv[3])
 NODETYPE_SEPARATOR = sys.argv[4]
 
-node_list = ['Food'+NODETYPE_SEPARATOR+'FOODON:03301713']
+node_list = ['Gene'+NODETYPE_SEPARATOR+'2']
 
 N = 10
 
