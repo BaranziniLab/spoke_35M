@@ -1,6 +1,6 @@
 GRAPH_PATH="../spoke41M_data/spoke_41M.gpickle"
 max_iter=200
-tol=1e-18
+tol=1e-12
 NODETYPE_SEPARATOR="|"
 
 
