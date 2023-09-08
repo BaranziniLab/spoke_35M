@@ -1,9 +1,9 @@
-GRAPH_PATH="../ncats/data/spoke_graph_ncats_version_2021_02_07.gpickle"
-MAPPING_FILE="../ncats/data/genes.csv"
+GRAPH_PATH="../spoke41M_data/spoke_41M.gpickle"
+MAPPING_FILE="../spoke41M_data/priority_genes.csv"
 IDENTIFIER_COLUMN="identifier"
 NCORES=80
 bucket_name="ic-spoke"
-sublocation="spoke35M/ncats/ppr_vectors"
+sublocation="spoke41M/ppr_vectors/genes"
 check_existing_compounds=0
 
 
