@@ -8,8 +8,9 @@ import joblib
 GRAPH_PATH = sys.argv[1]
 max_iter = int(sys.argv[2])
 tol = float(sys.argv[3])
+NODETYPE_SEPARATOR = sys.argv[4]
 
-node_list = ['Food:FOODON:03301713']
+node_list = ['Food'+NODETYPE_SEPARATOR+'FOODON:03301713']
 
 N = 10
 
