@@ -81,8 +81,8 @@ def compare_saved_ppr(MAPPING_FILE, IDENTIFIER_COLUMN, BUCKET_LOCATION, NODE_TYP
     cmd = "aws s3 ls s3://{}".format(BUCKET_LOCATION)
     out = os.popen(cmd)
     out_list = out.read().split("\n")
-    saved_compound_list = np.array([element for element in out_list if nodetype in element])
-    saved_compound_list_ = [nodetype + element.split(nodetype)[-1].replace('_dict.pickle', '') for element in saved_compound_list if nodetype in element]
+    saved_node_list = np.array([element for element in out_list if nodetype in element])
+    saved_node_list_ = [nodetype + element.split(nodetype)[-1].replace('_dict.pickle', '') for element in saved_node_list if nodetype in element]
     node_list = mapping_file_df[IDENTIFIER_COLUMN].unique()
-    node_list = list(set(node_list) - set(saved_compound_list_))
+    node_list = list(set(node_list) - set(saved_node_list_))
     return node_list

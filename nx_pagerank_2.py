@@ -29,14 +29,17 @@ def main():
         mapping_file_df = pd.read_csv(MAPPING_FILE)
         mapping_file_df.dropna(subset=[IDENTIFIER_COLUMN], inplace=True)
         node_list = list(mapping_file_df[IDENTIFIER_COLUMN].unique())
-
-    with open(GRAPH_PATH, "rb") as f:
-        G = pickle.load(f)
-    p = mp.Pool(NCORES)
-    p.map(personalized_pagerank, node_list)
-    p.close()
-    p.join()
-    print("Files are created and transferred to S3 in {} hrs".format(round((time.time() - start_time) / (60*60), 2)))
+    
+    if len(node_list) != 0:
+        with open(GRAPH_PATH, "rb") as f:
+            G = pickle.load(f)
+        p = mp.Pool(NCORES)
+        p.map(personalized_pagerank, node_list)
+        p.close()
+        p.join()
+        print("Files are created and transferred to S3 in {} hrs".format(round((time.time() - start_time) / (60*60), 2)))
+    else:
+        print("Node list is empty!")
 
 
 
