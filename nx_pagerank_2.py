@@ -15,15 +15,16 @@ IDENTIFIER_COLUMN = sys.argv[3]
 NCORES = int(sys.argv[4])
 bucket_name = sys.argv[5]
 sublocation = sys.argv[6]
-check_existing_compounds = int(sys.argv[7])
-
+check_any_saved_nodes = int(sys.argv[7])
+NODE_TYPE = sys.argv[8]
+NODE_TYPE_SEPERATOR = sys.argv[9]
 
 def main():
     start_time = time.time()
     global G
-    if check_existing_compounds == 1:
+    if check_any_saved_nodes == 1:
         bucket_location = bucket_name + "/" + sublocation + "/"
-        node_list = compare_saved_ppr(MAPPING_FILE, IDENTIFIER_COLUMN, bucket_location)
+        node_list = compare_saved_ppr(MAPPING_FILE, IDENTIFIER_COLUMN, bucket_location, NODE_TYPE, NODE_TYPE_SEPERATOR)
     else:
         mapping_file_df = pd.read_csv(MAPPING_FILE)
         mapping_file_df.dropna(subset=[IDENTIFIER_COLUMN], inplace=True)
