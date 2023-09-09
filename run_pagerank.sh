@@ -1,7 +1,7 @@
 GRAPH_PATH="../spoke41M_data/spoke_41M.gpickle"
 MAPPING_FILE="../spoke41M_data/priority_genes.csv"
 IDENTIFIER_COLUMN="identifier"
-NCORES=25
+NCORES=15
 bucket_name="ic-spoke"
 sublocation="spoke41M/ppr_vectors/genes"
 check_any_saved_nodes=1
