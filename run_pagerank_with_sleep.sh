@@ -13,7 +13,6 @@ total_rows=$(wc -l < "$MAPPING_FILE")
 
 while true; do
   num_files=$(aws s3 ls "s3://$bucket_name/$sublocation/" | wc -l)
-  num_files=$((num_files - 1))
   if [ "$num_files" -eq "$total_rows" ]; then
     echo "All PPR vectors are in the S3 bucket. Exiting the loop."
     break
