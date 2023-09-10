@@ -77,7 +77,7 @@ def get_significant_compounds_with_disease_association(compound_type, sample, se
 def compare_saved_ppr(MAPPING_FILE, IDENTIFIER_COLUMN, BUCKET_LOCATION, NODE_TYPE, NODE_TYPE_SEPARATOR):
     nodetype = NODE_TYPE + NODE_TYPE_SEPARATOR
     mapping_file_df = pd.read_csv(MAPPING_FILE)
-    mapping_file_df[IDENTIFIER_COLUMN] = nodetype + mapping_file_df[IDENTIFIER_COLUMN]
+    mapping_file_df[IDENTIFIER_COLUMN] = mapping_file_df[IDENTIFIER_COLUMN]
     cmd = "aws s3 ls s3://{}".format(BUCKET_LOCATION)
     out = os.popen(cmd)
     out_list = out.read().split("\n")
