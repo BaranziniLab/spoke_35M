@@ -10,19 +10,23 @@ import pickle
 import networkx as nx
 from s3_utility import read_pickle_file_from_s3
 
+
 GRAPH_PATH = sys.argv[1]
 MAPPING_FILE = sys.argv[2]
 BACTERIA_FILE = sys.argv[3]
 BUCKET_NAME = sys.argv[4]
 PPR_FILE_LOCATION = sys.argv[5]
-SAVE_LOCATION = sys.argv[6]
-NCORES = int(sys.argv[7])
+PPR_FEATURE_MAP_FILENAME = sys.argv[6]
+SAVE_LOCATION = sys.argv[7]
+SAVE_NAME = sys.argv[8]
+NCORES = int(sys.argv[9])
+NODE_TYPE_SEPARATOR = sys.argv[10]
 
 
 mapping_file_df = pd.read_csv(MAPPING_FILE)
 compound_names = mapping_file_df["compound_name"].unique()
 bacteria_df = pd.read_csv(BACTERIA_FILE, sep="\t")
-bacteria_df["type_id"] = "Organism:" + bacteria_df["spoke_identifier"].astype(str)
+bacteria_df["type_id"] = "Organism" + NODE_TYPE_SEPARATOR  + bacteria_df["spoke_identifier"].astype(str)
 
 def main():
 	global bacteria_feature_df_with_names, bacteria_feature_indices, G
@@ -30,7 +34,7 @@ def main():
 	with open(GRAPH_PATH, "rb") as f:
 		G = pickle.load(f)
 	feature_df = get_feature_map()
-	feature_df["type_id"] = feature_df["node_type"] + ":" + feature_df["node_id"]
+	feature_df["type_id"] = feature_df["node_type"] + NODE_TYPE_SEPARATOR + feature_df["node_id"]
 	bacteria_feature_df = feature_df[feature_df["type_id"].isin(bacteria_df.type_id.unique())]
 	bacteria_feature_df_with_names = pd.merge(bacteria_feature_df, bacteria_df, on="type_id")
 	bacteria_feature_df_with_names = bacteria_feature_df_with_names[["spoke_identifier", "spoke_name"]]
@@ -41,7 +45,7 @@ def main():
 	p.join()
 
 	s3_client = boto3.client('s3')
-	file_name = SAVE_LOCATION + "/bcmm_compounds_all_bacteria.pickle"
+	file_name = SAVE_LOCATION + "/" + SAVE_NAME
 	binary_data = pickle.dumps(out_list_of_df)
 	s3_client.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=binary_data)
 	s3_client.close()
@@ -51,11 +55,11 @@ def main():
 
 def get_all_bacteria_for_the_compound(item):
 	bacteria_feature_df_with_names_ = bacteria_feature_df_with_names.copy()
-	bacteria_feature_df_with_names_["type_id"] = "Organism:" + bacteria_feature_df_with_names_["spoke_identifier"].astype(str)
+	bacteria_feature_df_with_names_["type_id"] = "Organism" + NODE_TYPE_SEPARATOR + bacteria_feature_df_with_names_["spoke_identifier"].astype(str)
 	bacteria_list = list(bacteria_feature_df_with_names_["type_id"])
 	bacteria_feature_df_with_names_.drop("type_id", axis=1, inplace=True)
 	spoke_compound_nodes_ids = list(mapping_file_df[mapping_file_df["compound_name"]==item].spoke_identifier.unique())
-	spoke_compound_nodes_ids = list(map(lambda x:"Compound:"+x, spoke_compound_nodes_ids))
+	# spoke_compound_nodes_ids = list(map(lambda x:"Compound:"+x, spoke_compound_nodes_ids))
 	spoke_vector = 0
 	shortest_pathlength_list = []
 	for compound_id in spoke_compound_nodes_ids:
@@ -90,7 +94,7 @@ def get_shortest_pathlength(source, target):
 
 def get_feature_map():
 	s3_client = boto3.client('s3')
-	object_key = PPR_FILE_LOCATION + "/spoke35M_ppr_features.csv"
+	object_key = PPR_FILE_LOCATION + "/" + PPR_FEATURE_MAP_FILENAME
 	s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=object_key)
 	feature_df = pd.read_csv(s3_object["Body"])
 	return feature_df
