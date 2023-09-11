@@ -11,7 +11,7 @@ NODE_TYPE_SEPARATOR=":"
 
 
 start_time=$(date +%s)
-conda run -n pagerank python extract_all_bacteria_for_bcmm_compounds.py "$GRAPH_PATH" "$MAPPING_FILE" "$BACTERIA_FILE" "$BUCKET_NAME" "$PPR_FILE_LOCATION" "$PPR_FEATURE_MAP_FILENAME" "$SAVE_LOCATION" "$SAVE_NAME" "$NCORES" "$NODE_TYPE_SEPARATOR"
+conda run -n pagerank python extract_all_bacteria_for_bcmm_compounds.py "$GRAPH_PATH" "$MAPPING_FILE" "$BACTERIA_FILE" "$BUCKET_NAME" "$PPR_FILE_LOCATION" "$PPR_FEATURE_MAP_FILENAME" "$SAVE_LOCATION" "$SAVE_NAME" "$NCORES" "$NODE_TYPE_SEPARATOR" >> logs/run_bacterial_extraction_from_bcmm_compounds.log 2>&1 &
 wait
 end_time=$(date +%s)
 time_taken_hours=$(( (end_time - start_time) / 3600 ))
