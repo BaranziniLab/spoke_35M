@@ -1,7 +1,7 @@
 GRAPH_PATH="../spoke_35M_data/spoke_35M_compound_pruned_version.gpickle"
 EXTERNAL_DATA_PATH="../bcmm_data/bcmm_experimental_associations_from_peter.json"
 MAPPING_FILE="../bcmm_data/compounds_with_experimental_associations_from_peter.csv"
-IDENTIFIER_COLUMN="identifier"
+IDENTIFIER_COLUMN="spoke_identifier"
 EXTERNAL_DATA_COEFF=0.5
 NCORES=4
 bucket_name="ic-spoke"
