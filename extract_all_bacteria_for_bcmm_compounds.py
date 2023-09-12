@@ -34,11 +34,11 @@ def main():
 	with open(GRAPH_PATH, "rb") as f:
 		G = pickle.load(f)
 	feature_df = get_feature_map()
-feature_df["type_id"] = feature_df["node_type"] + NODE_TYPE_SEPARATOR + feature_df["node_id"]
-bacteria_feature_df = feature_df[feature_df["type_id"].isin(bacteria_df.type_id.unique())]
-bacteria_feature_df_with_names = pd.merge(bacteria_feature_df, bacteria_df, on="type_id")
-bacteria_feature_df_with_names = bacteria_feature_df_with_names[["spoke_identifier", "spoke_name"]]
-bacteria_feature_indices = bacteria_feature_df.index.values
+	feature_df["type_id"] = feature_df["node_type"] + NODE_TYPE_SEPARATOR + feature_df["node_id"]
+	bacteria_feature_df = feature_df[feature_df["type_id"].isin(bacteria_df.type_id.unique())]
+	bacteria_feature_df_with_names = pd.merge(bacteria_feature_df, bacteria_df, on="type_id")
+	bacteria_feature_df_with_names = bacteria_feature_df_with_names[["spoke_identifier", "spoke_name"]]
+	bacteria_feature_indices = bacteria_feature_df.index.values
 	p = mp.Pool(NCORES)	
 	out_list_of_df = p.map(get_all_bacteria_for_the_compound, compound_names)
 	p.close()
