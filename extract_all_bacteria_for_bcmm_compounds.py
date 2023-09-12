@@ -16,7 +16,7 @@ MAPPING_FILE = sys.argv[2]
 BACTERIA_FILE = sys.argv[3]
 BUCKET_NAME = sys.argv[4]
 PPR_FILE_LOCATION = sys.argv[5]
-PPR_FEATURE_MAP_FILENAME = sys.argv[6]
+PPR_FEATURE_MAP_FILELOCATION = sys.argv[6]
 SAVE_LOCATION = sys.argv[7]
 SAVE_NAME = sys.argv[8]
 NCORES = int(sys.argv[9])
@@ -94,8 +94,7 @@ def get_shortest_pathlength(source, target):
 
 def get_feature_map():
 	s3_client = boto3.client('s3')
-	object_key = PPR_FILE_LOCATION + "/" + PPR_FEATURE_MAP_FILENAME
-	s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=object_key)
+	s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=PPR_FEATURE_MAP_FILELOCATION)
 	feature_df = pd.read_csv(s3_object["Body"])
 	return feature_df
 
