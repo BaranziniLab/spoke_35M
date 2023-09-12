@@ -1,4 +1,4 @@
-GRAPH_PATH="../spoke_35M_data/spoke_35M.gpickle"
+GRAPH_PATH="../spoke_35M_data/spoke_35M_compound_pruned_version.gpickle"
 MAPPING_FILE="../bcmm_data/compounds_with_experimental_associations_from_peter.csv"
 BACTERIA_FILE="../spoke_35M_data/spoke_bacteria_nodes.tsv"
 BUCKET_NAME="ic-spoke"
