@@ -9,7 +9,7 @@ from tables import *
 import time
 
 
-NUMBER_OF_FEATURES = sys.argv[1]
+NUMBER_OF_FEATURES = int(sys.argv[1])
 MAPPING_FILE = sys.argv[2]
 IDENTIFIER_COLUMN = sys.argv[3]
 BUCKET_NAME = sys.argv[4]
