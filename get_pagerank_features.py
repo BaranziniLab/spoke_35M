@@ -12,8 +12,10 @@ import pandas as pd
 GRAPH_PATH = sys.argv[1]
 BUCKET_NAME = sys.argv[2]
 FILE_LOCATION = sys.argv[3]
+SAVE_NAME = sys.argv[4]
+NODE_TYPE_SEPERATOR = sys.argv[5]
 
-node_list = ["Compound:inchikey:AAOVKJBEBIDNHE-UHFFFAOYSA-N"]
+node_list = ["Compound" + NODE_TYPE_SEPERATOR + "inchikey:AAOVKJBEBIDNHE-UHFFFAOYSA-N"]
 
 
 def main():
@@ -31,7 +33,7 @@ def main():
 	features.loc[:, "node_type"] = features.node_id.apply(lambda x:x.split(":")[0])
 	features.node_id = features.node_id.apply(lambda x:":".join(x.split(":")[1:]))
 	csv_data = features.to_csv(index=False)
-	file_name = "{}/spoke35M_ppr_features.csv".format(FILE_LOCATION)
+	file_name = "{}/{}".format(FILE_LOCATION, SAVE_NAME)
 	s3_client = boto3.client('s3')
 	s3_client.put_object(Body=csv_data, Bucket=BUCKET_NAME, Key=file_name)
 
