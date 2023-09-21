@@ -85,7 +85,8 @@ def extract_features(node_list_, sel_indices):
 		Key = SUBLOCATION + "/{}_dict.pickle".format(node_id)
 		embedding_dict = read_pickle_file_from_s3(BUCKET_NAME, Key)
 		embedding_arr = embedding_dict["embedding"]
-		embedding_reduced_dim.append(embedding_arr[sel_indices])
+		embedding_arr_red = embedding_arr[sel_indices]		
+		embedding_reduced_dim.append(np.divide(embedding_arr_red, np.linalg.norm(embedding_arr_red)))
 		row_info.append((node_id, row_index))
 	row_df = pd.DataFrame(row_info, columns=["node_id", "row_index"])
 	row_df.loc[:, "node_type"] = row_df.node_id.apply(lambda x:x.split(NODE_TYPE_SEPERATOR)[0])
