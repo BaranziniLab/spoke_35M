@@ -11,7 +11,10 @@ def read_pickle_file_from_s3(bucket_name, object_key):
 	data = pickle.loads(content)
 	return data
 
-
+def read_csv_file_from_s3(bucket_name, object_key):
+	s3_client = boto3.client('s3')
+	s3_object = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+	return pd.read_csv(s3_object["Body"])
 
 def get_saved_compoundid_from_s3(bucket_name, file_location):
 	bucket_location = bucket_name + "/" + file_location + "/"
