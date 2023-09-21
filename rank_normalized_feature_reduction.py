@@ -11,14 +11,15 @@ import time
 
 NUMBER_OF_FEATURES = sys.argv[1]
 MAPPING_FILE = sys.argv[2]
-BUCKET_NAME = sys.argv[3]
-SUBLOCATION = sys.argv[4]
-PPR_FEATURE_LOCATION = sys.argv[5]
-SAVE_PATH = sys.argv[6]
-SAVE_FILENAME = sys.argv[7]
-CHECK_ANY_SAVED_NODES = int(sys.argv[8])
-NODE_TYPE = sys.argv[9]
-NODE_TYPE_SEPERATOR = sys.argv[10]
+IDENTIFIER_COLUMN = sys.argv[3]
+BUCKET_NAME = sys.argv[4]
+SUBLOCATION = sys.argv[5]
+PPR_FEATURE_LOCATION = sys.argv[6]
+SAVE_PATH = sys.argv[7]
+SAVE_FILENAME = sys.argv[8]
+CHECK_ANY_SAVED_NODES = int(sys.argv[9])
+NODE_TYPE = sys.argv[10]
+NODE_TYPE_SEPERATOR = sys.argv[11]
 
 
 if CHECK_ANY_SAVED_NODES == 1:
