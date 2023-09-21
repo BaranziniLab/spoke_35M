@@ -30,8 +30,8 @@ def main():
 	features["features"] = np.array(list(personalized_pagerank.keys()))
 
 	features = pd.DataFrame(np.array(list(personalized_pagerank.keys())), columns=["node_id"])
-	features.loc[:, "node_type"] = features.node_id.apply(lambda x:x.split(":")[0])
-	features.node_id = features.node_id.apply(lambda x:":".join(x.split(":")[1:]))
+	features.loc[:, "node_type"] = features.node_id.apply(lambda x:x.split(NODE_TYPE_SEPERATOR)[0])
+	features.node_id = features.node_id.apply(lambda x:":".join(x.split(NODE_TYPE_SEPERATOR)[1:]))
 	csv_data = features.to_csv(index=False)
 	file_name = "{}/{}".format(FILE_LOCATION, SAVE_NAME)
 	s3_client = boto3.client('s3')
