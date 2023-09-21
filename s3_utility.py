@@ -2,6 +2,7 @@ import boto3
 import os
 import numpy as np
 import pickle
+import pandas as pd
 
 
 def read_pickle_file_from_s3(bucket_name, object_key):
